@@ -27,7 +27,7 @@ class WelcomeView(View):
         self.register_command('clear', lambda _: view_clear_commmand(self.console))
         
         self.register_command('register', lambda _: view_register_user(self.console.arguments, self.client_socket))
-        self.register_command('join', lambda _: view_join_user(self.console.arguments, self.client_socket))
+        self.register_command('join', lambda _: view_join_user(self.console.arguments, self.client_socket, self.view_handler))
 
     def on_render(self):
         print()

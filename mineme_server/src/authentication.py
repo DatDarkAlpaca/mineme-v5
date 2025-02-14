@@ -55,3 +55,6 @@ def handle_user_join(user_table: UserTable, server_socket: MineSocket, packet: P
 def handle_user_not_authenticated(server_socket: MineSocket, address: str):
     return server_socket.send_packet(PacketType.NOT_AUTH, '', address)
 
+
+def handle_user_left(address: str, clients: dict[User]):
+    del clients[address]

@@ -38,21 +38,23 @@ class View(Protocol):
 
 class ViewHandler:
     def __init__(self):
-        self.views: list[View] = []
+        self.views: dict[str] = {}
         self.current_view: None | View = None
     
-    def register_view(self, view: View) -> int:
+    def register_view(self, view: View, view_name: str):
         view._set_handler(self)
         view.on_startup()
         
-        self.views.append(view)
-        return len(self.views) - 1
+        self.views[view_name] = view
 
-    def set_view(self, view_handle: int):
+        if not self.current_view:
+            self.current_view = view
+
+    def set_view(self, view_name: str):
         if self.current_view:
             self.current_view.on_view_shutdown()
         
-        self.current_view = self.views[view_handle]
+        self.current_view = self.views[view_name]
         
         if self.current_view:
             self.current_view.on_view_startup()

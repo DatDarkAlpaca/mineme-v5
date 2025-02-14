@@ -1,10 +1,8 @@
-import bcrypt
-
 from mineme_core.network.network import MineSocket
 from mineme_core.network.packet import *
 
 
-def view_join_user(args: list[str], client_socket: MineSocket):
+def view_join_user(args: list[str], client_socket: MineSocket, view_handler):
     if len(args) < 2:
         return print('Usage: join <username> <password>')
         
@@ -20,4 +18,9 @@ def view_join_user(args: list[str], client_socket: MineSocket):
     if response_code == '1':
         return print('Usage: join <username> <password> | invalid credentials')
     
-    print('Successfully logged in!')
+    view_handler.set_view('game')
+
+
+def view_leave_user(client_socket: MineSocket, view_handler):
+    client_socket.send_packet_default(packet_type=PacketType.LEAVE_USER, data='')
+    view_handler.set_view('welcome')

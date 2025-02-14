@@ -1,14 +1,13 @@
-from enum import Enum
+from enum import Enum, auto
 from dataclasses import dataclass
 
 
 class PacketType(Enum):
-    REGISTER_USER = 0
-    REGISTER_PASSWORD = 2
-    JOIN_USER = 4
-    NOT_AUTH = 5,
-
-    MINE_COMMAND = 6
+    REGISTER_USER       = auto()
+    REGISTER_PASSWORD   = auto()
+    JOIN_USER           = auto()
+    LEAVE_USER          = auto()
+    NOT_AUTH            = auto()
 
 
 @dataclass

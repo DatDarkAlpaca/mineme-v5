@@ -10,7 +10,7 @@ class PlayerEntry:
 class PlayerTable(Table):
     def __init__(self, cursor: cursor):
         fields = [
-            TableField('uid', 'PRIMARY KEY NOT NULL UNIQUE'),
+            TableField('uid', 'TEXT PRIMARY KEY'),
             TableField('balance', 'REAL NOT NULL'),
         ]
 

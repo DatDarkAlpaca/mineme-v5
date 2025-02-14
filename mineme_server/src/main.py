@@ -39,6 +39,9 @@ def run():
         elif packet.type == PacketType.JOIN_USER:
             handle_user_join(user_table, server_socket, packet, address, clients)
 
+        elif packet.type == PacketType.LEAVE_USER:
+            handle_user_left(address, clients)
+
         # Authenticated only packets:
         else:
             if not clients.get(address) or not clients[address].authenticated:
