@@ -44,10 +44,10 @@ def handle_user_join(user_table: UserTable, server_socket: MineSocket, packet: P
     
     user_entry = user_table.fetch_user(username)
 
+    client.authenticated = True
+    client.uid = user_entry.uid
     client.username = user_entry.username
     client.display_name = user_entry.display_name
-    client.uid = user_entry.uid
-    client.authenticated = True
 
     server_socket.send_packet(PacketType.JOIN_USER, '0,success', address)
 

@@ -9,6 +9,8 @@ class PacketType(Enum):
     LEAVE_USER          = auto()
     NOT_AUTH            = auto()
 
+    CHECK_BALANCE       = auto()
+
 
 @dataclass
 class Packet:

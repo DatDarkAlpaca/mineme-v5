@@ -1,13 +1,7 @@
 import bcrypt
+
 from mineme_core.database.table import *
-
-
-@dataclass
-class UserEntry:
-    uid: str
-    username: str
-    display_name: str
-    password: str
+from mineme_core.game.user import *
 
 
 class UserTable(Table):
@@ -25,16 +19,16 @@ class UserTable(Table):
     def exists_user(self, username: str) -> bool:
         return self.exists('username', username)
     
-    def fetch_user(self, username: str) -> UserEntry | None:
+    def fetch_user(self, username: str) -> User | None:
         if not self.exists_user(username):
             return
 
         self.cursor.execute("SELECT uid, username, display_name, password FROM users WHERE username=%s", (username,))
         uid, username, display_name, password = self.cursor.fetchone()
         
-        return UserEntry(uid, username, display_name, password)
+        return User(uid, username, display_name, password)
 
-    def insert_user(self, entry: UserEntry):
+    def insert_user(self, entry: User):
         try:
             self.insert_entry(entry.uid, entry.username, entry.display_name, entry.password)
         except:

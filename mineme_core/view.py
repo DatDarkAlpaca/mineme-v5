@@ -12,9 +12,6 @@ class View(Protocol):
     def on_view_startup(self):
         ...
 
-    def on_render(self):
-        ...
-
     def on_update(self):
         ...
 

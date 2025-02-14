@@ -29,16 +29,16 @@ class WelcomeView(View):
         self.register_command('register', lambda _: view_register_user(self.console.arguments, self.client_socket))
         self.register_command('join', lambda _: view_join_user(self.console.arguments, self.client_socket, self.view_handler))
 
+        self.console.clear_terminal()
+        print(f"\n{self.logo}\n")
+
     def on_render(self):
-        print()
-        print(self.logo)
-        print()
-    
-    def on_update(self):
         self.console.get_input()
-        if self.handle_command(self.console.main_command, self.console.arguments):
-            return
 
         self.console.clear_terminal()
-        print('Invalid command. Please try again.')
-        print()
+        print(f"\n{self.logo}\n")
+
+        if self.handle_command(self.console.main_command, self.console.arguments):
+            return
+        else:
+            print('Invalid command. Please try again.')

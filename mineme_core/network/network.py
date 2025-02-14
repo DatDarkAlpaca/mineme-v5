@@ -17,7 +17,7 @@ class MineSocket:
         packet_type, data = data.decode().split(',', 1)
         return Packet(type=PacketType(int(packet_type)), data=data)
 
-    def send_packet_default(self, packet_type: PacketType, data: str):
+    def send_packet_default(self, packet_type: PacketType, data: str = ''):
         self.socket.sendto(self.encode_packet(packet_type, data), (self.address, self.port))
 
     def send_packet(self, packet_type: PacketType, data: str, address):

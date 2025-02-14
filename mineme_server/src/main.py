@@ -2,12 +2,16 @@ import os
 from threading import Thread
 
 from mineme_core.network.network import *
+from mineme_core.database.ore_table import *
 from mineme_core.database.user_table import *
 from mineme_core.database.player_table import *
+from mineme_core.database.category_table import *
+
 from mineme_core.utils.environment import initialize_environment
 from mineme_core.database.database import create_database_connection
 
 from user import *
+from game import *
 from authentication import *
 
 
@@ -17,12 +21,18 @@ def initialize_database():
 
     user_table = UserTable(cursor)
     player_table = PlayerTable(cursor)
+    
+    ore_table = OreTable(cursor)
+    ores = ore_table.get_all_ores()
 
-    return user_table, player_table
+    ore_categories = OreCategoryTable(cursor)
+    categories = ore_categories.get_all_ore_categories()
+
+    return user_table, player_table, ores, categories
 
 
 def run():
-    user_table, player_table = initialize_database()
+    user_table, player_table, ores, categories = initialize_database()
 
     server_socket = initialize_server_socket(host=os.environ.get('SERVER_ADDRESS'), port=int(os.environ.get('SERVER_PORT')))
     clients: dict[User] = {}
@@ -45,7 +55,11 @@ def run():
         # Authenticated only packets:
         else:
             if not clients.get(address) or not clients[address].authenticated:
-                return handle_user_not_authenticated(server_socket, address)
+                handle_user_not_authenticated(server_socket, address)
+                continue
+
+            if packet.type == PacketType.CHECK_BALANCE:
+                handle_balance(clients[address], address, server_socket, player_table)
 
 
 def main():

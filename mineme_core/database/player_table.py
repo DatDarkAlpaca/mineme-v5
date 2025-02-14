@@ -1,10 +1,5 @@
+from mineme_core.game.player import Player
 from mineme_core.database.table import *
-
-
-@dataclass
-class PlayerEntry:
-    uid: str
-    balance: float
 
 
 class PlayerTable(Table):
@@ -15,3 +10,11 @@ class PlayerTable(Table):
         ]
 
         super().__init__(cursor, 'players', fields)
+
+    def fetch_player(self, uid: str) -> Player:
+        if not self.exists('uid', uid):
+            return
+        
+        self.cursor.execute("SELECT uid, balance FROM players WHERE uid = %s", (uid,))
+        uid, balance = self.cursor.fetchone()
+        return Player(uid, balance)
