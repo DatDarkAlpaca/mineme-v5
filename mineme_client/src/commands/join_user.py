@@ -17,7 +17,10 @@ def view_join_user(args: list[str], client_socket: MineSocket, view_handler):
 
     if response_code == '1':
         return print('Usage: join <username> <password> | invalid credentials')
-    
+
+    username, display_name = data.split(',', 1)
+
+    view_handler.get_view('game').set_user(username, display_name)
     view_handler.set_view('game')
 
 

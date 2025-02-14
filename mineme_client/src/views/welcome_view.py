@@ -23,22 +23,26 @@ class WelcomeView(View):
         self.logo = read_file(LOGO_FILE)
 
         self.register_command('quit', lambda _: view_quit_commmand(self.application))
-        self.register_command('cls', lambda _: view_clear_commmand(self.console))
-        self.register_command('clear', lambda _: view_clear_commmand(self.console))
+        self.register_command('cls', lambda _: view_clear_commmand(self.console, self))
+        self.register_command('clear', lambda _: view_clear_commmand(self.console, self))
         
         self.register_command('register', lambda _: view_register_user(self.console.arguments, self.client_socket))
         self.register_command('join', lambda _: view_join_user(self.console.arguments, self.client_socket, self.view_handler))
 
+    def on_view_startup(self):
         self.console.clear_terminal()
-        print(f"\n{self.logo}\n")
+        self.display_header()
 
     def on_render(self):
         self.console.get_input()
 
         self.console.clear_terminal()
-        print(f"\n{self.logo}\n")
+        self.display_header()
 
         if self.handle_command(self.console.main_command, self.console.arguments):
             return
         else:
             print('Invalid command. Please try again.')
+        
+    def display_header(self):
+        print(f"\n{self.logo}\n")

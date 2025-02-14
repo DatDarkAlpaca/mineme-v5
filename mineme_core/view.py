@@ -6,6 +6,9 @@ class View(Protocol):
         self.command_list: dict = {}
         self.handler = None
 
+    def display_header(self):
+        ...
+
     def on_startup(self):
         ...
 
@@ -46,6 +49,9 @@ class ViewHandler:
 
         if not self.current_view:
             self.current_view = view
+
+    def get_view(self, view_name: str) -> View | None:
+        return self.views.get(view_name)
 
     def set_view(self, view_name: str):
         if self.current_view:

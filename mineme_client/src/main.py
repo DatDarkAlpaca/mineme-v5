@@ -13,6 +13,8 @@ def main():
     app.view_handler.register_view(WelcomeView(app), 'welcome')
     app.view_handler.register_view(GameView(app), 'game')
 
+    app.view_handler.set_view('welcome')
+
     app.run()
 
 

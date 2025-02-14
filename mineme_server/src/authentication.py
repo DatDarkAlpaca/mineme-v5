@@ -25,7 +25,7 @@ def handle_user_registration_username(user_table: UserTable, server_socket: Mine
 def handle_user_registration_password(user_table: UserTable, server_socket: MineSocket, packet: Packet, address: str, client: User):
     salted_password = packet.data
 
-    entry = UserEntry(str(uuid.uuid4()), client.username, client.username, salted_password)
+    entry = User(str(uuid.uuid4()), client.username, client.username, salted_password)
     if not user_table.insert_user(entry):
         return server_socket.send_packet(PacketType.REGISTER_PASSWORD, '1,database', address)
 
@@ -49,7 +49,7 @@ def handle_user_join(user_table: UserTable, server_socket: MineSocket, packet: P
     client.username = user_entry.username
     client.display_name = user_entry.display_name
 
-    server_socket.send_packet(PacketType.JOIN_USER, '0,success', address)
+    server_socket.send_packet(PacketType.JOIN_USER, f"0,{client.username},{client.display_name}", address)
 
 
 def handle_user_not_authenticated(server_socket: MineSocket, address: str):
