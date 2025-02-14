@@ -1,0 +1,68 @@
+Common Rocks:
+[x] earth
+[x] stone
+[x] coal
+[x] basalt
+[x] granite
+[x] marble
+
+Normal Rocks:
+[x] bauxite
+[x] chalcopyrite
+[x] cuprite
+[x] petalite
+[x] digenite
+[x] malachite
+[x] azurite
+
+Metals:
+[x] iron
+[x] copper
+[x] nickel
+[x] titanium
+[x] vanadium
+[x] cadmium
+[x] chromium
+[x] manganese
+[x] zinc
+[x] aluminum
+[x] uranium
+
+Precious Metals:
+[ ] molybdenum
+[ ] palladium
+[ ] platinum
+[ ] silver
+[ ] gold
+
+Gems:
+[ ] alexandrite
+[ ] amazonite
+[ ] amber
+[ ] amethyst
+[ ] argentite
+[ ] ruby
+[ ] emerald
+[ ] anatase
+[ ] sapphire
+[ ] opal
+[ ] aquamarine
+[ ] diamond
+
+Rarest Gems:
+[ ] blue_diamond
+[ ] black_diamond
+[ ] tourmaline
+[ ] imperial_tourmaline
+
+Special Gems:
+[ ] rainbow_alpanium
+[ ] rose_alpaca_quartz
+[ ] noir_alpaca_quartz
+
+Event:
+[ ] emanubranium
+[ ] guinonium
+[ ] mokuhonium
+[ ] mussonium
+[ ] morganium
