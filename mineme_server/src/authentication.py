@@ -1,8 +1,9 @@
 import bcrypt
 import uuid
 from mineme_core.database.user_table import *
-from mineme_core.network.network import Packet, PacketType, MineSocket
 from mineme_core.database.user_table import UserTable
+from mineme_core.database.player_table import PlayerTable
+from mineme_core.network.network import Packet, PacketType, MineSocket
 
 from user import User
 
@@ -22,11 +23,14 @@ def handle_user_registration_username(user_table: UserTable, server_socket: Mine
     clients[address] = User(username=username)
 
 
-def handle_user_registration_password(user_table: UserTable, server_socket: MineSocket, packet: Packet, address: str, client: User):
+def handle_user_registration_password(user_table: UserTable, player_table: PlayerTable, server_socket: MineSocket, packet: Packet, address: str, client: User):
     salted_password = packet.data
 
     entry = User(str(uuid.uuid4()), client.username, client.username, salted_password)
     if not user_table.insert_user(entry):
+        return server_socket.send_packet(PacketType.REGISTER_PASSWORD, '1,database', address)
+
+    if not player_table.insert_player(entry.uid):
         return server_socket.send_packet(PacketType.REGISTER_PASSWORD, '1,database', address)
 
     server_socket.send_packet(PacketType.REGISTER_PASSWORD, '0,success', address)

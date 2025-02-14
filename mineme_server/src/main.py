@@ -24,7 +24,7 @@ def initialize_database():
     
     ore_table = OreTable(cursor)
     ores = ore_table.get_all_ores()
-
+    
     ore_categories = OreCategoryTable(cursor)
     categories = ore_categories.get_all_ore_categories()
 
@@ -44,7 +44,7 @@ def run():
             handle_user_registration_username(user_table, server_socket, packet, address, clients)
     
         elif packet.type == PacketType.REGISTER_PASSWORD:
-            handle_user_registration_password(user_table, server_socket, packet, address, clients[address])
+            handle_user_registration_password(user_table, player_table, server_socket, packet, address, clients[address])
 
         elif packet.type == PacketType.JOIN_USER:
             handle_user_join(user_table, server_socket, packet, address, clients)
@@ -60,6 +60,9 @@ def run():
 
             if packet.type == PacketType.CHECK_BALANCE:
                 handle_balance(clients[address], address, server_socket, player_table)
+
+            elif packet.type == PacketType.MINE:
+                handle_mine(clients[address], address, server_socket, player_table, ores)
 
 
 def main():

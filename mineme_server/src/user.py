@@ -3,7 +3,8 @@ from dataclasses import dataclass
 
 @dataclass
 class User:
+    uid: str = ''
     username: str = ''
     display_name: str = ''
-    uid: str = ''
+    password: str = ''
     authenticated: bool = False

@@ -10,6 +10,7 @@ class PacketType(Enum):
     NOT_AUTH            = auto()
 
     CHECK_BALANCE       = auto()
+    MINE                = auto()
 
 
 @dataclass
