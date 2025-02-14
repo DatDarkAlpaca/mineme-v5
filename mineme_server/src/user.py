@@ -6,3 +6,4 @@ class User:
     username: str = ''
     display_name: str = ''
     uid: str = ''
+    authenticated: bool = False
