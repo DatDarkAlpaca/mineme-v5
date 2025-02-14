@@ -20,5 +20,4 @@ def view_join_user(args: list[str], client_socket: MineSocket):
     if response_code == '1':
         return print('Usage: join <username> <password> | invalid credentials')
     
-    print(response_code, data)
     print('Successfully logged in!')
