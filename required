@@ -1,0 +1,11 @@
+# Client:
+SERVER_ADDRESS      = 127.0.0.1
+SERVER_PORT         = 60534
+
+# Server:
+DATABASE_PEPPER     = pepper
+DATABASE_NAME       = mineme
+DATABASE_HOST       = 
+DATABASE_USER       = 
+DATABASE_PASSWORD   = 
+DATABASE_PORT       = 5432
