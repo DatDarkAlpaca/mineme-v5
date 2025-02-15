@@ -12,17 +12,20 @@ class PlayerTable(Table):
 
         super().__init__(cursor, 'players', fields)
 
-    def insert_player(self, uid: str, balance: int = 0):
+    def insert_player(self, uid: str, balance: int = 0) -> bool:
         try:
             self.cursor.execute(f"INSERT INTO players (uid, balance) VALUES (%s, %s)", (uid, balance))
         except:
             return False
         return True
 
-    def fetch_player(self, uid: str) -> Player:
+    def fetch_player(self, uid: str) -> Player | None:
         if not self.exists('uid', uid):
             return
         
         self.cursor.execute("SELECT uid, balance FROM players WHERE uid = %s", (uid,))
         uid, balance = self.cursor.fetchone()
         return Player(uid, balance)
+
+    def update_player_balance(self, uid: str, balance: float):
+        self.cursor.execute("UPDATE players SET balance=%s WHERE uid = %s", (balance, uid))

@@ -1,8 +1,10 @@
 from enum import Enum, auto
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 class PacketType(Enum):
+    INVALID             = auto()
+
     REGISTER_USER       = auto()
     REGISTER_PASSWORD   = auto()
     JOIN_USER           = auto()
@@ -15,5 +17,15 @@ class PacketType(Enum):
 
 @dataclass
 class Packet:
-    type: PacketType
-    data: str
+    type: PacketType = PacketType.INVALID
+    data: dict = field(default_factory=dict)
+
+
+@dataclass
+class RecvPacket:
+    packet: Packet
+    address: str
+    valid: bool = True
+
+    def get_reason(self) -> str:
+        return self.packet.data['reason']

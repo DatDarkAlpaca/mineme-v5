@@ -10,20 +10,24 @@ def view_join_user(args: list[str], client_socket: MineSocket, view_handler):
     password = args[1]
 
     # username:
-    client_socket.send_packet_default(packet_type=PacketType.JOIN_USER, data=f"{username},{password}")
+    data = {
+        'username': username,
+        'password': password
+    }
 
-    packet, _ = client_socket.receive_packet()
-    response_code, data = packet.data.split(',', 1)
+    client_socket.send(Packet(PacketType.JOIN_USER, data))
+    packet_result = client_socket.receive()
 
-    if response_code == '1':
-        return print('Usage: join <username> <password> | invalid credentials')
+    if not packet_result.valid:
+        return print(f"Usage: join <usaname> <paswword> | {packet_result.get_reason()}")
 
-    username, display_name = data.split(',', 1)
+    username = packet_result.packet.data['username']
+    display_name = packet_result.packet.data['display_name']
 
     view_handler.get_view('game').set_user(username, display_name)
     view_handler.set_view('game')
 
 
 def view_leave_user(client_socket: MineSocket, view_handler):
-    client_socket.send_packet_default(packet_type=PacketType.LEAVE_USER, data='')
+    client_socket.send(Packet(PacketType.LEAVE_USER))
     view_handler.set_view('welcome')

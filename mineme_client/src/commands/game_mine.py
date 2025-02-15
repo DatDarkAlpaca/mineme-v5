@@ -1,19 +1,16 @@
-import json
-from mineme_core.network.network import MineSocket, PacketType
+from mineme_core.constants import CURRENCY_SYMBOL
+from mineme_core.network.network import *
 
 
-def view_mine(client_socket: MineSocket):
-    client_socket.send_packet_default(PacketType.MINE)
+def cmd_mine(client_socket: MineSocket):
+    client_socket.send(Packet(PacketType.MINE))
 
-    packet, _ = client_socket.receive_packet()
-    response_code, data = packet.data.split(',', 1)
+    packet_result = client_socket.receive()
+    if not packet_result.valid:
+        return print(f"Usage: mine | {packet_result.get_reason()}")
 
-    if response_code == '1':
-        return print('Failed to mine anything...')
-    
-    ore_data = json.loads(data)
-    name = ore_data['ore_name']
-    weight = ore_data['weight']    
-    price = ore_data['price']
+    ore_name = packet_result.packet.data['ore_name']
+    weight = packet_result.packet.data['weight']
+    price = packet_result.packet.data['price']
 
-    print(name, weight, price)
+    print(f"You struck {ore_name}! It weighs {weight:.2f}kg, and it's worth {CURRENCY_SYMBOL}{price:.2f}!")

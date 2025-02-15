@@ -12,26 +12,28 @@ def view_register_user(args: list[str], client_socket: MineSocket):
     password = args[1]
 
     # username:
-    client_socket.send_packet_default(packet_type=PacketType.REGISTER_USER, data=username)
+    data = {
+        'username': username
+    }
+    client_socket.send(Packet(PacketType.REGISTER_USER, data=data))
 
-    packet, _ = client_socket.receive_packet()
-    response_code, response = packet.data.split(',', 1)
+    packet_result = client_socket.receive()
 
-    if response_code == '1':
-        if response == 'short':
-            return print('Usage: register <username> <password> | username must be at least 3x characters long')
-        
-        elif response == 'taken':
-            return print(f"Usage: register <username> <password> | username '{username}' has already been taken")
+    if not packet_result.valid:
+        return print(f"Usage: register <username> <password> | {packet_result.get_reason()}")
+
+    salt = packet_result.packet.data['salt']
 
     # password:
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt=response.encode('utf-8')).decode()
-    client_socket.send_packet_default(packet_type=PacketType.REGISTER_PASSWORD, data=hashed_password)
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt=salt.encode('utf-8')).decode()
 
-    packet, _ = client_socket.receive_packet()
-    response_code, response = packet.data.split(',', 1)
+    data = {
+        'hash_pass': hashed_password
+    }
+    client_socket.send(Packet(PacketType.REGISTER_PASSWORD, data=data))
 
-    if response_code == '1':
-        return print(f"Usage: register <username> <password> | could not register username {username}. please contact the admins")
-    
+    packet_result = client_socket.receive()
+    if not packet_result.valid:
+        return print(f"Usage: register <username> <password> | {packet_result.get_reason()}")
+
     return print(f"Successfully registered user: {username}. Use the command 'join <username> <password>' to join")

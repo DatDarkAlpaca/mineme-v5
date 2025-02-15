@@ -6,8 +6,8 @@ from commands.quit import view_quit_commmand
 from commands.clear import view_clear_commmand
 from commands.join_user import view_leave_user
 
-from commands.game_balance import view_balance
-from commands.game_mine import view_mine
+from commands.game_balance import cmd_check_balance
+from commands.game_mine import cmd_mine
 
 
 class GameView(View):
@@ -32,8 +32,8 @@ class GameView(View):
 
         self.register_command('leave', lambda _: view_leave_user(self.client_socket, self.view_handler))
 
-        self.register_command('balance', lambda _: view_balance(self.client_socket))
-        self.register_command('mine', lambda _: view_mine(self.client_socket))
+        self.register_command('balance', lambda _: cmd_check_balance(self.client_socket))
+        self.register_command('mine', lambda _: cmd_mine(self.client_socket))
 
     def on_view_startup(self):
         self.console.clear_terminal()

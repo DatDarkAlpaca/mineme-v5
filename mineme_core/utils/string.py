@@ -10,4 +10,4 @@ def get_number_with_separator(number: float) -> str:
         return formatted_integer
     
     else:
-        return f"{formatted_integer}.{fractional_part}"
+        return f"{formatted_integer}.{fractional_part[:2]}"

@@ -13,6 +13,7 @@ class Application:
         self.running = True
 
         self.client_socket = MineSocket(os.environ.get('SERVER_ADDRESS'), int(os.environ.get('SERVER_PORT')))
+        self.client_socket.set_timeout(SERVER_TIMEOUT)
 
     def run(self):
         while self.running:
