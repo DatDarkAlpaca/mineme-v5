@@ -1,5 +1,3 @@
-import json
-
 from mineme_core.game.ore import Ore
 from mineme_core.network.network import *
 from mineme_core.database.player_table import *
@@ -49,7 +47,7 @@ def mine_callback(server_app: ServerAppData, packet: RecvPacket):
     if not player:
         data = {
             'code': RESULT_FAILED,
-            'reason': f"player {player.uid} not found"
+            'reason': f"player {uid} not found"
         }
         return server_socket.send(Packet(PacketType.MINE, data), address)
 
@@ -60,7 +58,9 @@ def mine_callback(server_app: ServerAppData, packet: RecvPacket):
         'code': RESULT_PASSED,
         'ore_name': ore_data.ore.name,
         'weight': ore_data.weight,
-        'price': ore_price
+        'price': ore_price,
+        'min_weight': ore_data.ore.min_weight,
+        'max_weight': ore_data.ore.max_weight
     }
 
     balance = player.balance
