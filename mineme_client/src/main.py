@@ -10,10 +10,10 @@ def main():
     initialize_environment('./.env')
 
     app = Application()
-    app.view_handler.register_view(WelcomeView(app), 'welcome')
-    app.view_handler.register_view(GameView(app), 'game')
+    app.context.view_handler.register_view(WelcomeView(app.context), 'welcome')
+    app.context.view_handler.register_view(GameView(app.context), 'game')
 
-    app.view_handler.set_view('welcome')
+    app.context.view_handler.set_view('welcome')
 
     app.run()
 

@@ -1,2 +1,5 @@
-def view_quit_commmand(application):
-    application.running = False
+from context import ClientContext
+
+
+def cmd_quit(context: ClientContext):
+    context.running = False
