@@ -1,6 +1,7 @@
 from mineme_core.constants import CURRENCY_SYMBOL, SIZE_MODIFIERS
 from mineme_core.network.network import *
 
+from termcolor import colored
 
 def get_size_modifier(weight: float, min_weight: float, max_weight: float):
     modifiers_amount = len(SIZE_MODIFIERS)
@@ -28,5 +29,5 @@ def cmd_mine(client_socket: MineSocket):
     min_weight = packet_result.packet.data['min_weight']
     max_weight = packet_result.packet.data['max_weight']
 
-    size_modifier = get_size_modifier(weight, min_weight, max_weight)
+    size_modifier = colored(get_size_modifier(weight, min_weight, max_weight), 'red')
     print(f"You struck {size_modifier}{ore_name}! It weighs {weight:.2f}kg, and it's worth {CURRENCY_SYMBOL}{price:.2f}!")

@@ -8,4 +8,4 @@ SERVER_TIMEOUT = 3
 CURRENCY_SYMBOL = 'W$'
 CURRENCY_NAME   = 'wonps'
 
-SIZE_MODIFIERS = ['a tiny ', 'a small ', '', 'a nig ', 'a massive ', 'a humongous ']
+SIZE_MODIFIERS = ['a tiny ', 'a small ', '', 'a big ', 'a massive ', 'a humongous ']
