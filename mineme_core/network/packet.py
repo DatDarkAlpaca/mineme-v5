@@ -13,6 +13,7 @@ class PacketType(Enum):
 
     CHECK_BALANCE       = auto()
     MINE                = auto()
+    GAMBLE              = auto()
 
 
 @dataclass

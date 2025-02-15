@@ -88,6 +88,7 @@ class ServerApp:
         # Game:
         packet_handler.register(PacketType.CHECK_BALANCE, lambda packet_result: self.__check_balance(packet_result))  
         packet_handler.register(PacketType.MINE, lambda packet_result: self.__mine(packet_result))
+        packet_handler.register(PacketType.GAMBLE, lambda packet_result: self.__gamble(packet_result))
 
     def __initialize_tables(self):
         database_data = self.context.database_data
@@ -108,6 +109,7 @@ class ServerApp:
     def __initialize_command_delays(self):
         self.command_delays[PacketType.MINE] = 1
         self.command_delays[PacketType.REGISTER_PASSWORD] = 1
+        self.command_delays[PacketType.GAMBLE] = 10
 
     def __check_command_delay(self, packet_result: RecvPacket) -> bool:
         session_token = packet_result.get_session_token()
@@ -123,10 +125,13 @@ class ServerApp:
         last_executed = session.command_delays[type]
         
         delay = datetime.now() - last_executed
-        is_delay_over = delay > timedelta(seconds=self.command_delays.get(type, DEFAULT_COMMAND_DELAY))
+        delay_seconds = delay.total_seconds()
 
+        is_delay_over = delay > timedelta(seconds=self.command_delays.get(type, DEFAULT_COMMAND_DELAY))
+        
         if not is_delay_over:
-            send_delayed_command_packet(self.context.server_socket, delay, packet_result.address)
+            send_delayed_command_packet(self.context.server_socket, delay_seconds, packet_result.address)
+            return True
 
         session.set_command_delay(type)
 
@@ -143,3 +148,9 @@ class ServerApp:
             unauthenticated_callback(self.context, packet_result)
 
         mine_callback(self.context, packet_result)
+
+    def __gamble(self, packet_result: RecvPacket):
+        if not self._user_authenticated(packet_result):
+            unauthenticated_callback(self.context, packet_result)
+
+        gamble_callback(self.context, packet_result)

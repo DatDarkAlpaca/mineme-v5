@@ -8,6 +8,7 @@ from commands.join_user import cmd_leave
 
 from commands.game_balance import cmd_check_balance
 from commands.game_mine import cmd_mine
+from commands.game_gamble import cmd_gamble
 
 from context import ClientContext
 
@@ -33,6 +34,7 @@ class GameView(View):
 
         self.register_command('balance', lambda _: cmd_check_balance(self.context))
         self.register_command('mine', lambda _: cmd_mine(self.context))
+        self.register_command('gamble', lambda _: cmd_gamble(self.context))
 
     def on_view_startup(self):
         self.context.console.clear_terminal()
