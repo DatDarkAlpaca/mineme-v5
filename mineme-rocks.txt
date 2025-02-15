@@ -35,6 +35,9 @@ Precious Metals:
 [ ] silver
 [ ] gold
 
+Crystals:
+[ ] 
+
 Gems:
 [ ] alexandrite
 [ ] amazonite
@@ -66,3 +69,5 @@ Event:
 [ ] mokuhonium
 [ ] mussonium
 [ ] morganium
+[ ] heidonium
+[ ] potanium
