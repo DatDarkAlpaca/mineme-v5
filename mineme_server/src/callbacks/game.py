@@ -1,21 +1,24 @@
-from mineme_core.game.ore import Ore
+from mineme_core.game.mine import mine
 from mineme_core.network.network import *
 from mineme_core.database.player_table import *
+from mineme_server.src.application_context import ServerContext
 
-from mineme_core.game.user import User
-from mineme_core.game.mine import mine
-
-from application_data import ServerAppData
+from utils.packet_utils import *
 
 
-def check_balance_callback(server_app: ServerAppData, packet: RecvPacket):
-    server_socket = server_app.server_socket
-    player_table = server_app.database_data.player_table
+def check_balance_callback(context: ServerContext, packet_result: RecvPacket):
+    server_socket = context.server_socket
+    player_table = context.database_data.player_table
 
-    address = packet.address
-    client = server_app.client_data[packet.address]
+    address = packet_result.address
 
-    uid = client.user.uid
+    session_token = packet_result.get_session_token()
+    session = context.session_data.get(session_token)
+
+    if not session:
+        return send_invalid_session_packet(server_socket, address)
+
+    uid = session.user.uid
     player = player_table.fetch_player(uid)
 
     if not player:
@@ -33,15 +36,20 @@ def check_balance_callback(server_app: ServerAppData, packet: RecvPacket):
     server_socket.send(Packet(PacketType.CHECK_BALANCE, data), address)
 
 
-def mine_callback(server_app: ServerAppData, packet: RecvPacket):
-    server_socket = server_app.server_socket
-    player_table = server_app.database_data.player_table
-    ores = server_app.database_data.ores
+def mine_callback(context: ServerContext, packet_result: RecvPacket):
+    server_socket = context.server_socket
+    player_table = context.database_data.player_table
+    ores = context.database_data.ores
 
-    address = packet.address
-    client = server_app.client_data[address]
+    address = packet_result.address
 
-    uid = client.user.uid
+    session_token = packet_result.get_session_token()
+    session = context.session_data.get(session_token)
+
+    if not session:
+        return send_invalid_session_packet(server_socket, address)
+
+    uid = session.user.uid
     player = player_table.fetch_player(uid)
     
     if not player:

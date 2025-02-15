@@ -8,7 +8,7 @@ RESULT_FAILED = 1
 
 
 class MineSocket:
-    def __init__(self, address: str, port: int):
+    def __init__(self, address: str = '', port: int = 0):
         self.address: str = address
         self.port: int = port
 

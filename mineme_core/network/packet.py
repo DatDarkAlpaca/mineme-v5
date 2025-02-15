@@ -28,4 +28,7 @@ class RecvPacket:
     valid: bool = True
 
     def get_reason(self) -> str:
-        return self.packet.data['reason']
+        return self.packet.data.get('reason', 'unknown reason | server possibly disconnected')
+    
+    def get_session_token(self) -> str:
+        return self.packet.data['session_token']

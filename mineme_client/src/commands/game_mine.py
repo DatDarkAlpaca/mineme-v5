@@ -1,5 +1,6 @@
 from mineme_core.constants import CURRENCY_SYMBOL, SIZE_MODIFIERS
 from mineme_core.network.network import *
+from context import ClientContext
 
 from termcolor import colored
 
@@ -16,8 +17,13 @@ def get_size_modifier(weight: float, min_weight: float, max_weight: float):
     return ''
 
 
-def cmd_mine(client_socket: MineSocket):
-    client_socket.send(Packet(PacketType.MINE))
+def cmd_mine(context: ClientContext):
+    client_socket = context.client_socket
+
+    data = {
+        'session_token': context.session_token
+    }
+    client_socket.send(Packet(PacketType.MINE, data))
 
     packet_result = client_socket.receive()
     if not packet_result.valid:

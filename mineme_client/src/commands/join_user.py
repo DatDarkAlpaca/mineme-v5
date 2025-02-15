@@ -1,8 +1,14 @@
 from mineme_core.network.network import MineSocket
 from mineme_core.network.packet import *
 
+from context import ClientContext
 
-def view_join_user(args: list[str], client_socket: MineSocket, view_handler):
+
+def cmd_join(context: ClientContext):
+    args = context.console.arguments
+    client_socket = context.client_socket
+    view_handler = context.view_handler
+    
     if len(args) < 2:
         return print('Usage: join <username> <password>')
         
@@ -23,11 +29,19 @@ def view_join_user(args: list[str], client_socket: MineSocket, view_handler):
 
     username = packet_result.packet.data['username']
     display_name = packet_result.packet.data['display_name']
+    session_token = packet_result.get_session_token()
 
-    view_handler.get_view('game').set_user(username, display_name)
+    view_handler.get_view('game').set_user(username, display_name, session_token)
     view_handler.set_view('game')
 
 
-def view_leave_user(client_socket: MineSocket, view_handler):
-    client_socket.send(Packet(PacketType.LEAVE_USER))
+def cmd_leave(context: ClientContext):
+    client_socket = context.client_socket
+    view_handler = context.view_handler
+    
+    data = {
+        'session_token': context.session_token
+    }
+
+    client_socket.send(Packet(PacketType.LEAVE_USER, data))
     view_handler.set_view('welcome')
