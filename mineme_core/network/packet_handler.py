@@ -5,10 +5,18 @@ from typing import Callable
 class PacketHandler:
     def __init__(self):
         self.packet_map: dict[PacketType, Callable] = {}
-    
+        self.on_execute_callbacks: list[Callable] = []
+
+    def register_on_execute(self, callback: Callable):
+        self.on_execute_callbacks.append(callback)
+
     def execute_packet(self, packet_result: RecvPacket):
         if not packet_result.valid:
             return
+
+        for execute_callback in self.on_execute_callbacks:
+            if not execute_callback(packet_result):
+                return
 
         packet_map_result = self.packet_map.get(packet_result.packet.type)
         if not packet_map_result:

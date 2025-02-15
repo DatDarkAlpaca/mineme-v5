@@ -1,5 +1,5 @@
 import os
-from datetime import timedelta
+from datetime import timedelta, datetime
 from threading import Thread, Lock
 
 from mineme_core.constants import * 
@@ -7,20 +7,22 @@ from mineme_core.network.network import *
 from mineme_core.network.packet_handler import *
 from mineme_core.database.database import create_database_connection
 
-from mineme_server.src.session_data import *
 from database_data import *
 from callbacks.game import *
 from callbacks.authentication import *
+from mineme_server.src.session_data import *
 from mineme_server.src.application_context import ServerContext
 
 
 class ServerApp:
     def __init__(self, server_address: str, server_port: int):
         self.context = ServerContext()
-        
+        self.command_delays: dict[PacketType, int] = {}
+
         self.context.server_socket = initialize_server_socket(server_address, server_port)
         self.server_lock = Lock()
 
+        self.__initialize_command_delays()
         self.__initialize_tables()
         self.__initialize_server_data()
 
@@ -65,6 +67,7 @@ class ServerApp:
     def __initialize_server_data(self):
         # Authentication:
         packet_handler = self.context.packet_handler
+        packet_handler.register_on_execute(lambda packet_result: self.__check_command_delay(packet_result))
 
         packet_handler.register(PacketType.REGISTER_USER, lambda packet_result: 
             register_user_callback(self.context, packet_result)
@@ -102,6 +105,33 @@ class ServerApp:
         database_data.ores = ore_table.get_all_ores()
         database_data.ore_categories = ore_categories.get_all_ore_categories()
 
+    def __initialize_command_delays(self):
+        self.command_delays[PacketType.MINE] = 1
+        self.command_delays[PacketType.REGISTER_PASSWORD] = 1
+
+    def __check_command_delay(self, packet_result: RecvPacket) -> bool:
+        session_token = packet_result.get_session_token()
+        if not session_token:
+            return True
+
+        type = packet_result.packet.type
+
+        session = self.context.session_data.get(session_token)
+        if not session:
+            return True
+
+        last_executed = session.command_delays[type]
+        
+        delay = datetime.now() - last_executed
+        is_delay_over = delay > timedelta(seconds=self.command_delays.get(type, DEFAULT_COMMAND_DELAY))
+
+        if not is_delay_over:
+            send_delayed_command_packet(self.context.server_socket, delay, packet_result.address)
+
+        session.set_command_delay(type)
+
+        return is_delay_over
+            
     def __check_balance(self, packet_result: RecvPacket):
         if not self._user_authenticated(packet_result):
             unauthenticated_callback(self.context, packet_result)
