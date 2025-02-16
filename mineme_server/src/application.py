@@ -101,6 +101,7 @@ class ServerApp:
         packet_handler.register(PacketType.CHECK_BALANCE, lambda packet_result: self.__check_balance(packet_result))  
         packet_handler.register(PacketType.MINE, lambda packet_result: self.__mine(packet_result))
         packet_handler.register(PacketType.GAMBLE, lambda packet_result: self.__gamble(packet_result))
+        packet_handler.register(PacketType.ORE, lambda packet_result: ore_callback(self.context, packet_result))
 
     def __handle_command_cooldown(self, packet_result: RecvPacket) -> bool:
         type = packet_result.packet.type
