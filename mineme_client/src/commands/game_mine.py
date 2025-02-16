@@ -28,11 +28,13 @@ def cmd_mine(context: ClientContext):
     if not packet_result.valid:
         return print(f"Usage: mine | {packet_result.get_reason()}")
 
-    ore_name = packet_result.packet.data['ore_name']
-    weight = packet_result.packet.data['weight']
-    price = packet_result.packet.data['price']
-    min_weight = packet_result.packet.data['min_weight']
-    max_weight = packet_result.packet.data['max_weight']
+    data = packet_result.packet.data
+
+    ore_name = data['ore_name']
+    weight = data['weight']
+    price = data['price']
+    min_weight = data['min_weight']
+    max_weight = data['max_weight']
 
     size_modifier = get_size_modifier(weight, min_weight, max_weight)
     print(f"You struck {size_modifier}{ore_name}! It weighs {weight:.2f}kg, and it's worth {CURRENCY_SYMBOL}{price:.2f}!")

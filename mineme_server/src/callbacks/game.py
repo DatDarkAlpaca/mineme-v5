@@ -30,7 +30,6 @@ def check_balance_callback(context: ServerContext, packet_result: RecvPacket):
             'code': RESULT_FAILED,
             'reason': f"player {uid} not found"
         }
-
         return server_socket.send(Packet(PacketType.CHECK_BALANCE, data), address)
 
     data = {
@@ -108,16 +107,16 @@ def gamble_callback(context: ServerContext, packet_result: RecvPacket):
     
     if not amount or not multiplier:
         return send_invalid_args()
-    
-    uid = session.user.uid
-    balance = player_table.fetch_player(uid).balance
-    
+     
     if multiplier <= 1.0 or multiplier > 10.0:
         data = {
             'code': RESULT_FAILED,
             'reason': f"multipler must be greater than 1.0, and smaller than 10.0"
         }
         return server_socket.send(Packet(PacketType.GAMBLE, data), address)
+
+    uid = session.user.uid
+    balance = player_table.fetch_player(uid).balance
 
     if balance < amount:
         data = {
@@ -130,11 +129,7 @@ def gamble_callback(context: ServerContext, packet_result: RecvPacket):
     random_number = random.uniform(0, 100)
     win = random_number <= odds
 
-    data = {
-        'win': 1 if win else 0
-    }
-    server_socket.send(Packet(PacketType.GAMBLE, data), address)
-
+    # update balance:
     balance = player_table.fetch_player(session.user.uid).balance
 
     if win:
@@ -143,3 +138,10 @@ def gamble_callback(context: ServerContext, packet_result: RecvPacket):
         new_balance = balance - amount
 
     player_table.update_player_balance(session.user.uid, new_balance)
+
+    # packet:
+    data = {
+        'code': RESULT_PASSED,
+        'win': 1 if win else 0
+    }
+    server_socket.send(Packet(PacketType.GAMBLE, data), address)

@@ -25,16 +25,23 @@ class MineSocket:
             data, address = self.socket.recvfrom(1024)
             recv_packet = RecvPacket(packet=self._decode_packet(data), address=address, valid=True)
 
+            if recv_packet.packet.type == PacketType.TIMEOUT:
+                recv_packet.valid = False
+
             if recv_packet.packet.data['code'] == RESULT_FAILED:
                 recv_packet.valid = False
 
-            return recv_packet          
+            return recv_packet  
 
         except socket.timeout:
-            return RecvPacket(packet=Packet(), address='', valid=False)
+            data = {
+                'code': RESULT_FAILED,
+                'reason': 'request timeout'
+            }
+            return RecvPacket(packet=Packet(PacketType.TIMEOUT, data=data), address='', valid=False)
         
-        except Exception as e:
-            return RecvPacket(packet=Packet(), address='', valid=False)
+        except Exception:
+            return RecvPacket(packet=Packet(PacketType.INVALID), address='', valid=False)
 
     def set_timeout(self, timeout: float):
         self.socket.settimeout(timeout)

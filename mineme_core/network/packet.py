@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 
 class PacketType(Enum):
     INVALID             = auto()
+    TIMEOUT             = auto()
 
     REGISTER_USER       = auto()
     REGISTER_PASSWORD   = auto()
@@ -29,7 +30,7 @@ class RecvPacket:
     valid: bool = True
 
     def get_reason(self) -> str:
-        return self.packet.data.get('reason', 'unknown reason | server possibly disconnected')
+        return self.packet.data.get('reason', 'server possibly disconnected')
     
     def get_session_token(self) -> str | None:
         return self.packet.data.get('session_token')

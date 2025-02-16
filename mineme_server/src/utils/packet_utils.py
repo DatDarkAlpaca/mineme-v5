@@ -10,7 +10,6 @@ def send_invalid_session_packet(server_socket: MineSocket, address):
     server_socket.send(Packet(PacketType.INVALID, data), address)
 
 def send_delayed_command_packet(server_socket: MineSocket, delay: float, address):
-    print(delay)
     data = {
         'code': RESULT_FAILED,
         'reason': f"you must wait {delay:.2f}s to use this command again"

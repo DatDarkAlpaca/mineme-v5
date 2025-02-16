@@ -14,8 +14,8 @@ class PacketHandler:
         if not packet_result.valid:
             return
 
-        for execute_callback in self.on_execute_callbacks:
-            if not execute_callback(packet_result):
+        for on_execute in self.on_execute_callbacks:
+            if not on_execute(packet_result):
                 return
 
         packet_map_result = self.packet_map.get(packet_result.packet.type)

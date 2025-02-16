@@ -12,3 +12,13 @@ class DatabaseData:
     player_table: None | PlayerTable = None
     ores: list[Ore] = field(default_factory=list)
     ore_categories: list[OreCategory] = field(default_factory=list)
+
+    def initialize(self, cursor):
+        self.user_table = UserTable(cursor)
+        self.player_table = PlayerTable(cursor)
+
+        ore_table = OreTable(cursor)
+        ore_categories = OreCategoryTable(cursor)
+
+        self.ores = ore_table.get_all_ores()
+        self.ore_categories = ore_categories.get_all_ore_categories()

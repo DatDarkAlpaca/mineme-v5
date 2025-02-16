@@ -1,29 +1,21 @@
 import os
-from datetime import timedelta, datetime
 from threading import Thread, Lock
+from datetime import timedelta, datetime
 
 from mineme_core.constants import * 
-from mineme_core.network.network import *
-from mineme_core.network.packet_handler import *
-from mineme_core.database.database import create_database_connection
+from mineme_server.src.application_context import ServerContext
 
-from database_data import *
 from callbacks.game import *
 from callbacks.authentication import *
-from mineme_server.src.session_data import *
-from mineme_server.src.application_context import ServerContext
 
 
 class ServerApp:
     def __init__(self, server_address: str, server_port: int):
         self.context = ServerContext()
-        self.command_delays: dict[PacketType, int] = {}
-
-        self.context.server_socket = initialize_server_socket(server_address, server_port)
+        self.context.initialize(server_address, server_port)
+                
         self.server_lock = Lock()
 
-        self.__initialize_command_delays()
-        self.__initialize_tables()
         self.__initialize_server_data()
 
     def run(self):
@@ -67,7 +59,7 @@ class ServerApp:
     def __initialize_server_data(self):
         # Authentication:
         packet_handler = self.context.packet_handler
-        packet_handler.register_on_execute(lambda packet_result: self.__check_command_delay(packet_result))
+        packet_handler.register_on_execute(lambda packet_result: self.__handle_command_cooldown(packet_result))
 
         packet_handler.register(PacketType.REGISTER_USER, lambda packet_result: 
             register_user_callback(self.context, packet_result)
@@ -90,67 +82,45 @@ class ServerApp:
         packet_handler.register(PacketType.MINE, lambda packet_result: self.__mine(packet_result))
         packet_handler.register(PacketType.GAMBLE, lambda packet_result: self.__gamble(packet_result))
 
-    def __initialize_tables(self):
-        database_data = self.context.database_data
-
-        self.context.db_connection = create_database_connection()
-        self.context.db_cursor = self.context.db_connection.cursor()
-        cursor = self.context.db_cursor
-
-        database_data.user_table = UserTable(cursor)
-        database_data.player_table = PlayerTable(cursor)
-
-        ore_table = OreTable(cursor)
-        ore_categories = OreCategoryTable(cursor)
-
-        database_data.ores = ore_table.get_all_ores()
-        database_data.ore_categories = ore_categories.get_all_ore_categories()
-
-    def __initialize_command_delays(self):
-        self.command_delays[PacketType.MINE] = 1
-        self.command_delays[PacketType.REGISTER_PASSWORD] = 1
-        self.command_delays[PacketType.GAMBLE] = 10
-
-    def __check_command_delay(self, packet_result: RecvPacket) -> bool:
-        session_token = packet_result.get_session_token()
-        if not session_token:
-            return True
-
+    def __handle_command_cooldown(self, packet_result: RecvPacket) -> bool:
         type = packet_result.packet.type
 
+        if type in [PacketType.REGISTER_USER, PacketType.REGISTER_PASSWORD, PacketType.JOIN_USER]:
+            return True
+
+        session_token = packet_result.get_session_token()
         session = self.context.session_data.get(session_token)
-        if not session:
-            return True
-
-        last_executed = session.command_delays[type]
+        if not session_token or not session:
+            send_invalid_session_packet(self.context.server_socket, packet_result.address)
+            return False
         
-        delay = datetime.now() - last_executed
-        delay_seconds = delay.total_seconds()
-
-        is_delay_over = delay > timedelta(seconds=self.command_delays.get(type, DEFAULT_COMMAND_DELAY))
+        last_executed = session.command_cooldowns.get_cooldown(type)
         
-        if not is_delay_over:
-            send_delayed_command_packet(self.context.server_socket, delay_seconds, packet_result.address)
-            return True
+        time_passed = datetime.now() - last_executed
+        cooldown_time = timedelta(seconds=self.context.cooldown_table.get_delay(type))
 
-        session.set_command_delay(type)
+        if time_passed < cooldown_time:
+            remaining = cooldown_time.total_seconds() - time_passed.total_seconds()
+            send_delayed_command_packet(self.context.server_socket, remaining, packet_result.address)
+            return False
 
-        return is_delay_over
+        session.command_cooldowns.use_command(type)
+        return True
             
     def __check_balance(self, packet_result: RecvPacket):
         if not self._user_authenticated(packet_result):
-            unauthenticated_callback(self.context, packet_result)
+            return unauthenticated_callback(self.context, packet_result)
 
         check_balance_callback(self.context, packet_result)
     
     def __mine(self, packet_result: RecvPacket):
         if not self._user_authenticated(packet_result):
-            unauthenticated_callback(self.context, packet_result)
+            return unauthenticated_callback(self.context, packet_result)
 
         mine_callback(self.context, packet_result)
 
     def __gamble(self, packet_result: RecvPacket):
         if not self._user_authenticated(packet_result):
-            unauthenticated_callback(self.context, packet_result)
+            return unauthenticated_callback(self.context, packet_result)
 
         gamble_callback(self.context, packet_result)

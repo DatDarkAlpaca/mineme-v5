@@ -87,6 +87,7 @@ def register_password_callback(context: ServerContext, packet_result: RecvPacket
 def join_user_callback(context: ServerContext, packet_result: RecvPacket):
     server_socket = context.server_socket
     user_table = context.database_data.user_table
+    session_data = context.session_data
 
     address = packet_result.address
 
@@ -100,13 +101,21 @@ def join_user_callback(context: ServerContext, packet_result: RecvPacket):
         }
         return server_socket.send(Packet(PacketType.JOIN_USER, data), address)
 
+    for session_token, session_info in session_data.items():
+        if session_info.user.username == username:
+            data = {
+                'code': RESULT_FAILED,
+                'reason': 'user already connected'
+            }
+            return server_socket.send(Packet(PacketType.JOIN_USER, data), address)
+
     user_entry = user_table.fetch_user(username)
 
     # session:
     session_token = create_session_token()
-    context.session_data[session_token] = SessionData()
+    session_data [session_token] = SessionData()
 
-    session = context.session_data[session_token]
+    session = session_data [session_token]
     session.authenticated = True
 
     session.user.uid = user_entry.uid

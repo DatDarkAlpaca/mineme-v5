@@ -14,7 +14,8 @@ def cmd_check_balance(context: ClientContext):
     packet_result = client_socket.receive()
 
     if not packet_result.valid:
-        return print(f"usage: mine | {packet_result.get_reason()}")
+        return print(f"usage: balance | {packet_result.get_reason()}")
         
-    balance = float(packet_result.packet.data['balance'])
-    print(f"You currently have: {CURRENCY_SYMBOL}{get_number_with_separator(balance)}")
+    balance = packet_result.packet.data['balance']
+    
+    print(f"You currently have: {CURRENCY_SYMBOL}{get_number_with_separator(float(balance))}")

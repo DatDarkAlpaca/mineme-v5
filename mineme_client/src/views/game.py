@@ -40,6 +40,11 @@ class GameView(View):
         self.context.console.clear_terminal()
         self.display_header()
 
+    def on_view_shutdown(self):
+        self.username = ''
+        self.display_name = ''
+        self.context.session_token = ''
+
     def on_render(self):
         self.context.console.get_input()
 
