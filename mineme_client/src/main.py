@@ -2,12 +2,15 @@ import os
 from views.welcome_view import WelcomeView
 from views.game import GameView
 from mineme_client.src.application import Application
+from mineme_core.localization import initialize_localization
 from mineme_core.utils.environment import initialize_environment
 
 
 def main():
     os.chdir('./mineme_client')
+
     initialize_environment('./.env')
+    initialize_localization('./languages.json')
 
     app = Application()
     app.context.view_handler.register_view(WelcomeView(app.context), 'welcome')

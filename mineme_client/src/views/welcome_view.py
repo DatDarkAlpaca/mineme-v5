@@ -1,4 +1,5 @@
 from mineme_core.view import View
+from mineme_core.localization import _tr
 from mineme_core.constants import LOGO_FILE
 from mineme_core.utils.file import read_file
 
@@ -39,7 +40,7 @@ class WelcomeView(View):
         if self.handle_command(self.context.console.main_command, self.context.console.arguments):
             return
         else:
-            print('Invalid command. Please try again.')
+            print(_tr('Invalid command. Please try again.'))
         
     def display_header(self):
         print(f"\n{self.logo}\n")

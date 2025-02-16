@@ -1,5 +1,7 @@
 from context import ClientContext
+
 from mineme_core.constants import *
+from mineme_core.localization import _tr
 from mineme_core.network.network import *
 from mineme_core.utils.string import get_number_with_separator
 
@@ -18,4 +20,4 @@ def cmd_check_balance(context: ClientContext):
         
     balance = packet_result.packet.data['balance']
     
-    print(f"You currently have: {CURRENCY_SYMBOL}{get_number_with_separator(float(balance))}")
+    print(_tr("You currently have {0}{1}", CURRENCY_SYMBOL, get_number_with_separator(float(balance))))

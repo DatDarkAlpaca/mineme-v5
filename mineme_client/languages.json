@@ -1,0 +1,12 @@
+{
+    "en": {
+        "Invalid command. Please try again.": "Invalid command. Please try again.",
+
+        "You currently have {0}{1}": "You currently have {0}{1}"
+    },
+    "ptbr": {
+        "Invalid command. Please try again.": "Comando inválido. Por favor, tente novamente.",
+
+        "You currently have {0}{1}": "Seu saldo é de: {0}{1}"
+    }
+}

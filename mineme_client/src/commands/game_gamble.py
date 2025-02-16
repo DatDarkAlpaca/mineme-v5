@@ -9,7 +9,7 @@ def cmd_gamble(context: ClientContext):
     client_socket = context.client_socket
 
     if len(args) == 0:
-        return print('Usage: gamble <amount> <multiplier=2.0>')
+        return print('usage: gamble <amount> <multiplier=2.0>')
 
     amount = args[0]
     multiplier = 2.0
@@ -18,7 +18,7 @@ def cmd_gamble(context: ClientContext):
         try:
             multiplier = float(args[1])
         except:
-            return print('Usage: gamble <amount> <multiplier=2.0>')
+            return print('usage: gamble <amount> <multiplier=2.0>')
 
     data = {
         'amount': amount,
@@ -29,7 +29,7 @@ def cmd_gamble(context: ClientContext):
 
     packet_result = client_socket.receive()
     if not packet_result.valid:
-        return print(f"Usage: gamble <amount> <multiplier> | {packet_result.get_reason()}")
+        return print(f"usage: gamble <amount> <multiplier> | {packet_result.get_reason()}")
 
     win = packet_result.packet.data['win']
     
