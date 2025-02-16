@@ -65,7 +65,7 @@ class ServerApp:
                     last_active = session_data.last_activity
                     idle_duration = now - last_active
                     
-                    timed_out = idle_duration > timedelta(minutes=SESSION_TIMEOUT)
+                    timed_out = idle_duration > timedelta(minutes=float(os.environ.get('SESSION_TIMEOUT')))
                     if not timed_out:
                         continue
 

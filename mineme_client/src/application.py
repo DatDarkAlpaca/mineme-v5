@@ -10,7 +10,7 @@ class Application:
         self.context = ClientContext()
 
         self.context.client_socket = MineSocket(os.environ.get('SERVER_ADDRESS'), int(os.environ.get('SERVER_PORT')))
-        self.context.client_socket.set_timeout(CLIENT_TIMEOUT)
+        self.context.client_socket.set_timeout(float(os.environ.get('CLIENT_TIMEOUT')))
     
     def run(self):
         while self.context.running:

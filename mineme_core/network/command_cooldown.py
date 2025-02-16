@@ -1,6 +1,6 @@
+import os
 from datetime import datetime
 from mineme_core.network.packet import *
-from mineme_core.constants import DEFAULT_COMMAND_DELAY
 
 
 class CommandCooldown:
@@ -31,4 +31,4 @@ class CommandCooldownTable:
 
     @classmethod
     def get_delay(cls, type: PacketType):
-        return cls.command_delays.get(type, DEFAULT_COMMAND_DELAY)
+        return cls.command_delays.get(type, float(os.environ.get('DEFAULT_COMMAND_DELAY')))
