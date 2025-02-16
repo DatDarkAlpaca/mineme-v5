@@ -1,6 +1,7 @@
-from mineme_core.constants import CURRENCY_SYMBOL, SIZE_MODIFIERS
-from mineme_core.network.network import *
 from context import ClientContext
+from mineme_core.localization import _tr
+from mineme_core.network.network import *
+from mineme_core.constants import CURRENCY_SYMBOL, SIZE_MODIFIERS
 
 
 def get_size_modifier(weight: float, min_weight: float, max_weight: float):
@@ -37,4 +38,6 @@ def cmd_mine(context: ClientContext):
     max_weight = data['max_weight']
 
     size_modifier = get_size_modifier(weight, min_weight, max_weight)
-    print(f"You struck {size_modifier}{ore_name}! It weighs {weight:.2f}kg, and it's worth {CURRENCY_SYMBOL}{price:.2f}!")
+
+    print(_tr("You struck {0}{1}! It weighs {2:.2f}kg, and it's worth {3}{4:.2f}!",
+              size_modifier, ore_name, weight, CURRENCY_SYMBOL, price))

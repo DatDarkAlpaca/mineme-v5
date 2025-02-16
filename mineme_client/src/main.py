@@ -2,6 +2,7 @@ import os
 from views.welcome_view import WelcomeView
 from views.game import GameView
 from mineme_client.src.application import Application
+
 from mineme_core.localization import initialize_localization
 from mineme_core.utils.environment import initialize_environment
 

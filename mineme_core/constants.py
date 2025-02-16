@@ -1,4 +1,5 @@
 from termcolor import colored
+from mineme_core.localization import _tr
 
 
 RESOURCES_FOLDERS = 'res/'

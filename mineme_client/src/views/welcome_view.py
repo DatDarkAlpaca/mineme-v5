@@ -31,6 +31,7 @@ class WelcomeView(View):
     def on_view_startup(self):
         self.context.console.clear_terminal()
         self.display_header()
+        print(_tr("Use the 'join' command to enter the game"))
 
     def on_render(self):
         self.context.console.get_input()

@@ -1,7 +1,7 @@
 import bcrypt
 
-from mineme_core.network.network import MineSocket
 from mineme_core.network.packet import *
+from mineme_core.localization import _tr
 
 from context import ClientContext
 
@@ -43,4 +43,4 @@ def cmd_register(context: ClientContext):
     if not packet_result.valid:
         return print(f"Usage: register <username> <password> | {packet_result.get_reason()}")
 
-    return print(f"Successfully registered user: {username}. Use the command 'join <username> <password>' to join")
+    print(_tr("Successfully registered user: {}. Use the command 'join' to join", username))

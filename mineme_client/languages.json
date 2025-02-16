@@ -1,12 +1,44 @@
 {
     "en": {
-        "Invalid command. Please try again.": "Invalid command. Please try again.",
+        "Invalid command. Please try again.": 
+            "Invalid command. Please try again.",
 
-        "You currently have {0}{1}": "You currently have {0}{1}"
+        "You currently have {0}{1}": 
+            "You currently have {0}{1}",
+
+        "a tiny ": "a tiny ",
+        "a small ": "a small",
+        "a big ": "a big ",
+        "a massive ": "a massive ",
+        "a humongous ": "a humongous ",
+        "You struck {0}{1}! It weighs {2:.2f}kg, and it's worth {3}{4:.2f}!":
+            "You struck {0}{1}! It weighs {2:.2f}kg, and it's worth {3}{4:.2f}!",
+
+        "Successfully registered user: {}. Use the command 'join' to join": 
+            "Successfully registered user: {}. Use the command 'join' to join",
+
+        "Use the 'join' command to enter the game":
+            "Use the 'join' command to enter the game"
     },
     "ptbr": {
-        "Invalid command. Please try again.": "Comando inválido. Por favor, tente novamente.",
+        "Invalid command. Please try again.": 
+            "Comando inválido. Por favor, tente novamente.",
 
-        "You currently have {0}{1}": "Seu saldo é de: {0}{1}"
+        "You currently have {0}{1}": 
+            "Seu saldo é de: {0}{1}",
+
+        "a tiny ": "um(a) minúsculo(a)",
+        "a small ": "um(a) pequeno(a)",
+        "a big ": "um(a) grande",
+        "a massive ": "um(a) massivo(a)",
+        "a humongous ": "um(a) gigantesco(a)",
+        "You struck {0}{1}! It weighs {2:.2f}kg, and it's worth {3}{4:.2f}!":
+            "Você encontrou {0}{1}! Peso: {2:.2f}kg | Preço: {3}{4:.2f}!",
+
+        "Successfully registered user: {}. Use the command 'join' to join": 
+            "Usuário registrado com sucesso: {}. Use o commando 'join' para entrar",
+
+        "Use the 'join' command to enter the game":
+            "Use o comando 'join' para entrar"
     }
 }
