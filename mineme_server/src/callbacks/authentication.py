@@ -1,10 +1,11 @@
+import os
 import uuid
 import bcrypt
 from mineme_core.network.network import *
 from mineme_core.database.user_table import *
 
-from mineme_server.src.application_context import ServerContext
 from mineme_server.src.session_data import SessionData
+from mineme_server.src.application_context import ServerContext
 
 
 def create_session_token() -> str:
@@ -93,6 +94,13 @@ def join_user_callback(context: ServerContext, packet_result: RecvPacket):
 
     username = packet_result.packet.data['username']
     password = packet_result.packet.data['password']
+
+    if len(context.session_data) >= int(os.environ.get('SERVER_CAPACITY')):
+        data = {
+            'code': RESULT_FAILED,
+            'reason': 'server currently full. please try again later.'
+        }
+        return server_socket.send(Packet(PacketType.JOIN_USER, data), address)
 
     if not user_table.verify_user(username, password):
         data = {

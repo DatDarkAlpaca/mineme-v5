@@ -27,8 +27,23 @@ class ServerApp:
 
         host = os.environ.get('SERVER_ADDRESS')
         port = int(os.environ.get('SERVER_PORT'))
-        input(f"Initialized server at {host}:{port}. Press any key to shutdown...")
+        
+        print(f"Initialized server at {host}:{port}.")
+        while True:
+            command = input('> ').lower()
 
+            if command in ['quit', 'exit', 'q', 'e']:
+                return
+            
+            elif command == 'list':
+                print('Session list:')
+                for session_token, session_data in self.context.session_data.items():
+                    uid = session_data.user.uid
+                    username = session_data.user.username
+                    display = session_data.user.display_name
+
+                    print(f"* [{session_token}]: {username} ({display}) [{uid}]")
+        
     def _user_authenticated(self, packet_result: RecvPacket) -> bool:
         session_token = packet_result.get_session_token()
         return self.context.session_data.get(session_token) and self.context.session_data[session_token].authenticated
@@ -60,6 +75,7 @@ class ServerApp:
         # Authentication:
         packet_handler = self.context.packet_handler
         packet_handler.register_on_execute(lambda packet_result: self.__handle_command_cooldown(packet_result))
+        # TODO: last activity
 
         packet_handler.register(PacketType.REGISTER_USER, lambda packet_result: 
             register_user_callback(self.context, packet_result)
