@@ -18,7 +18,10 @@
             "Successfully registered user: {}. Use the command 'join' to join",
 
         "Use the 'join' command to enter the game":
-            "Use the 'join' command to enter the game"
+            "Use the 'join' command to enter the game",
+            
+        "You have transferred {0}{1:.2f} to {2}":
+            "You have transferred {0}{1:.2f} to {2}"
     },
     "ptbr": {
         "Invalid command. Please try again.": 
@@ -39,6 +42,9 @@
             "Usuário registrado com sucesso: {}. Use o commando 'join' para entrar",
 
         "Use the 'join' command to enter the game":
-            "Use o comando 'join' para entrar"
+            "Use o comando 'join' para entrar",
+
+        "You have transferred {0}{1:.2f} to {2}":
+            "Você transferiu {0}{1:.2f} para {2}"
     }
 }

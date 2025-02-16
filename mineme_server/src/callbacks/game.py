@@ -189,3 +189,56 @@ def ore_callback(context: ServerContext, packet_result: RecvPacket):
     }
 
     return server_socket.send(Packet(PacketType.ORE, data), address)
+
+
+def pay_callback(context: ServerContext, packet_result: RecvPacket):
+    server_socket = context.server_socket
+    user_table = context.database_data.user_table
+    player_table = context.database_data.player_table
+
+    address = packet_result.address
+
+    session_token = packet_result.get_session_token()
+    session = context.session_data.get(session_token)
+
+    if not session:
+        return send_invalid_session_packet(server_socket, address)
+
+    def send_invalid_args():
+        data = {
+            'code': RESULT_FAILED,
+            'reason': f"invalid arguments: username={username} | amount={amount}"
+        }
+        return server_socket.send(Packet(PacketType.PAY, data), address)
+
+    try:
+        username = packet_result.packet.data.get('username')
+        amount = float(packet_result.packet.data.get('amount'))
+    except:
+        return send_invalid_args()
+    
+    if not amount or not username:
+        return send_invalid_args()
+
+    # TOOD: check if username exists:
+    user = user_table.fetch_user(username)
+    receiver_uid = user.uid
+
+    uid = session.user.uid
+    balance = player_table.fetch_player(uid).balance
+
+    if balance < amount:
+        data = {
+            'code': RESULT_FAILED,
+            'reason': f"you do not have the required funds to pay {username}. Your current balance is: {CURRENCY_SYMBOL}{balance}"
+        }
+        return server_socket.send(Packet(PacketType.PAY, data), address)
+
+    # update sender's balance:
+    player_table.update_player_balance(uid, balance - amount)
+
+    # update receiver's balance:
+    receiver_balance = player_table.fetch_player(receiver_uid).balance
+    player_table.update_player_balance(receiver_uid , receiver_balance + amount)
+
+    server_socket.send(Packet(PacketType.PAY, {}), address)

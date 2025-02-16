@@ -102,6 +102,7 @@ class ServerApp:
         packet_handler.register(PacketType.MINE, lambda packet_result: self.__mine(packet_result))
         packet_handler.register(PacketType.GAMBLE, lambda packet_result: self.__gamble(packet_result))
         packet_handler.register(PacketType.ORE, lambda packet_result: ore_callback(self.context, packet_result))
+        packet_handler.register(PacketType.PAY, lambda packet_result: self.__pay(packet_result)) 
 
     def __handle_command_cooldown(self, packet_result: RecvPacket) -> bool:
         type = packet_result.packet.type
@@ -147,3 +148,9 @@ class ServerApp:
             return unauthenticated_callback(self.context, packet_result)
 
         gamble_callback(self.context, packet_result)
+
+    def __pay(self, packet_result: RecvPacket):
+        if not self._user_authenticated(packet_result):
+            return unauthenticated_callback(self.context, packet_result)
+
+        pay_callback(self.context, packet_result)

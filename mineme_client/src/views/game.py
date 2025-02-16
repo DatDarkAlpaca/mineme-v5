@@ -10,6 +10,7 @@ from commands.game_balance import cmd_check_balance
 from commands.game_mine import cmd_mine
 from commands.game_gamble import cmd_gamble
 from commands.game_ore import cmd_ore
+from commands.game_pay import cmd_pay
 
 from context import ClientContext
 
@@ -37,6 +38,7 @@ class GameView(View):
         self.register_command('mine', lambda _: cmd_mine(self.context))
         self.register_command('gamble', lambda _: cmd_gamble(self.context))
         self.register_command('ore', lambda _: cmd_ore(self.context))
+        self.register_command('pay', lambda _: cmd_pay(self.context))
 
     def on_view_startup(self):
         self.context.console.clear_terminal()
