@@ -121,9 +121,9 @@ def join_user_callback(context: ServerContext, packet_result: RecvPacket):
 
     # session:
     session_token = create_session_token()
-    session_data [session_token] = SessionData()
+    session_data[session_token] = SessionData()
 
-    session = session_data [session_token]
+    session = session_data[session_token]
     session.authenticated = True
 
     session.user.uid = user_entry.uid

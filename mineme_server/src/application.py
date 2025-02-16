@@ -1,4 +1,5 @@
 import os
+import time
 from threading import Thread, Lock
 from datetime import timedelta, datetime
 
@@ -50,8 +51,8 @@ class ServerApp:
 
     def __execute_server(self):
         while True:
+            packet_result = self.context.server_socket.receive()
             with self.server_lock:
-                packet_result = self.context.server_socket.receive()
                 self.context.packet_handler.execute_packet(packet_result)
 
     def __cleanup_timeout_sessions(self):
@@ -59,10 +60,12 @@ class ServerApp:
             now = datetime.now()
 
             with self.server_lock:
-                
                 expired_tokens = []
                 for session_token, session_data in self.context.session_data.items():
-                    timed_out = now - session_data.last_activity > timedelta(minutes=SESSION_TIMEOUT)
+                    last_active = session_data.last_activity
+                    idle_duration = now - last_active
+                    
+                    timed_out = idle_duration > timedelta(minutes=SESSION_TIMEOUT)
                     if not timed_out:
                         continue
 
@@ -70,12 +73,13 @@ class ServerApp:
 
                 for session_token in expired_tokens:
                     del self.context.session_data[session_token]
-                        
+        
+            time.sleep(1.0)
+
     def __initialize_server_data(self):
         # Authentication:
         packet_handler = self.context.packet_handler
         packet_handler.register_on_execute(lambda packet_result: self.__handle_command_cooldown(packet_result))
-        # TODO: last activity
 
         packet_handler.register(PacketType.REGISTER_USER, lambda packet_result: 
             register_user_callback(self.context, packet_result)
@@ -101,7 +105,7 @@ class ServerApp:
     def __handle_command_cooldown(self, packet_result: RecvPacket) -> bool:
         type = packet_result.packet.type
 
-        if type in [PacketType.REGISTER_USER, PacketType.REGISTER_PASSWORD, PacketType.JOIN_USER]:
+        if type in [PacketType.REGISTER_USER, PacketType.REGISTER_PASSWORD, PacketType.JOIN_USER, PacketType.LEAVE_USER]:
             return True
 
         session_token = packet_result.get_session_token()
@@ -112,7 +116,8 @@ class ServerApp:
         
         last_executed = session.command_cooldowns.get_cooldown(type)
         
-        time_passed = datetime.now() - last_executed
+        now = datetime.now()
+        time_passed = now - last_executed
         cooldown_time = timedelta(seconds=self.context.cooldown_table.get_delay(type))
 
         if time_passed < cooldown_time:
@@ -121,6 +126,7 @@ class ServerApp:
             return False
 
         session.command_cooldowns.use_command(type)
+        session.last_activity = now
         return True
             
     def __check_balance(self, packet_result: RecvPacket):
