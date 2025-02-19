@@ -29,10 +29,10 @@ class Console:
         self.set_cursor()
 
     def save_cursor(self):
-        sys.stdout.write("\x1b[s")
+        print("\0337", flush=True, end='')
     
     def restore_cursor(self):
-        sys.stdout.write("\x1b[u")
+        print("\0338", flush=True, end='')
     
     # Input:
     def get_input(self):
