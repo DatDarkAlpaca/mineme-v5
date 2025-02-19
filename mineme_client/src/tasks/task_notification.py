@@ -1,7 +1,7 @@
 from mineme_core.network.packet import Packet, PacketType
 from context import ClientContext
 from termcolor import colored
-import sys
+
 
 def handle_notifications(context: ClientContext):
     data = {

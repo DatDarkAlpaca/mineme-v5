@@ -32,8 +32,8 @@ def pay_callback(context: ServerContext, packet_result: RecvPacket):
         return send_invalid_args()
 
     # TOOD: check if username exists:
-    user = user_table.fetch_user(username)
-    receiver_uid = user.uid
+    receiver_user = user_table.fetch_user(username)
+    receiver_uid = receiver_user.uid
 
     uid = session.user.uid
     balance = player_table.fetch_player(uid).balance
@@ -50,5 +50,10 @@ def pay_callback(context: ServerContext, packet_result: RecvPacket):
     # update receiver's balance:
     receiver_balance = player_table.fetch_player(receiver_uid).balance
     player_table.update_player_balance(receiver_uid, receiver_balance + amount)
+
+    # send a notification to the receiver:
+    for _, receiver_session in context.session_data.items():
+        if receiver_session.user.username == username:
+            receiver_session.notification_queue.append(f"{session.user.display_name} sent you {CURRENCY_SYMBOL}{amount:.2f}")
 
     server_socket.send(Packet(PacketType.PAY, {}), address)
