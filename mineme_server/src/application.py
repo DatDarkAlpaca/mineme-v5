@@ -44,15 +44,27 @@ class ServerApp:
 
             if command in ["quit", "exit", "q", "e"]:
                 return
+            
+            if command.startswith('notify'):
+                
+                session_token = command.split(' ')[1]
+                message = command.split(' ')[2:]
 
+                session = self.context.session_data.get(session_token)
+                if not session:
+                    continue
+                
+                session.notification_queue.append(message)
+            
             elif command == "list":
                 print("Session list:")
                 for session_token, session_data in self.context.session_data.items():
                     uid = session_data.user.uid
+                    address = session_data.address
                     username = session_data.user.username
                     display = session_data.user.display_name
 
-                    print(f"* [{session_token}]: {username} ({display}) [{uid}]")
+                    print(f"* [{address}][{session_token}]: {username} ({display}) [{uid}]")
 
     def _user_authenticated(self, packet_result: RecvPacket) -> bool:
         session_token = packet_result.get_session_token()
@@ -102,6 +114,15 @@ class ServerApp:
             lambda packet_result: register_callback(self.context, packet_result),
         )
 
+        def poll_notification(packet_result):
+            self.context.session_data.get()
+            pass
+
+        packet_handler.register(
+            PacketType.POLL_NOTIFICATION,
+            poll_notification
+        )
+
         packet_handler.register(
             PacketType.JOIN_USER,
             lambda packet_result: join_callback(self.context, packet_result),
@@ -136,7 +157,6 @@ class ServerApp:
 
         if type in [
             PacketType.REGISTER_USER,
-            PacketType.REGISTER_PASSWORD,
             PacketType.JOIN_USER,
             PacketType.LEAVE_USER,
         ]:

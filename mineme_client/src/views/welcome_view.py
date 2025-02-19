@@ -3,12 +3,9 @@ from mineme_core.localization import _tr
 from mineme_core.constants import LOGO_FILE
 from mineme_core.utils.file import read_file
 
-from mineme_client.src.commands.cmd_quit import cmd_quit
-from mineme_client.src.commands.cmd_clear import cmd_clear
-from mineme_client.src.commands.cmd_register import cmd_register
-from mineme_client.src.commands.cmd_join import cmd_join
-
 from context import ClientContext
+from tasks import handle_notifications
+from commands import cmd_quit, cmd_clear, cmd_register, cmd_join
 
 
 class WelcomeView(View):
@@ -20,6 +17,9 @@ class WelcomeView(View):
 
     def on_startup(self):
         self.logo = read_file(LOGO_FILE)
+
+        # self.register_task(lambda: handle_notifications(self.context), 5)
+        # self.register_task(lambda: example(), 1)
 
         self.register_command("quit", lambda _: cmd_quit(self.context))
         self.register_command("cls", lambda _: cmd_clear(self.context))

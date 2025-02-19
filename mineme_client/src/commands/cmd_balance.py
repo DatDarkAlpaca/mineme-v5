@@ -6,7 +6,7 @@ from mineme_core.network.packet import Packet, PacketType
 from mineme_core.utils.string import get_number_with_separator
 
 
-def cmd_check_balance(context: ClientContext):
+def cmd_balance(context: ClientContext):
     client_socket = context.client_socket
 
     data = {"session_token": context.session_token}

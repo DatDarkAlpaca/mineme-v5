@@ -38,10 +38,7 @@ def register_callback(context: ServerContext, packet_result: RecvPacket):
         return server_socket.send(Packet(PacketType.INVALID, data), address)
 
     # password:
-    salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(
-        password.encode("utf-8"), salt=salt.encode("utf-8")
-    ).decode()
+    hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt=bcrypt.gensalt()).decode()
 
     entry = User(str(uuid.uuid4()), username, username, hashed_password)
     if not user_table.insert_user(entry):

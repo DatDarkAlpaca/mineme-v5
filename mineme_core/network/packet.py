@@ -15,6 +15,8 @@ class PacketType(Enum):
     ORE = auto()
     PAY = auto()
 
+    POLL_NOTIFICATION = auto()
+
 
 @dataclass
 class Packet:

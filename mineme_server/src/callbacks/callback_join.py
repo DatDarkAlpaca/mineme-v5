@@ -43,6 +43,7 @@ def join_callback(context: ServerContext, packet_result: RecvPacket):
     session = session_data[session_token]
     session.authenticated = True
 
+    session.address = address
     session.user.uid = user_entry.uid
     session.user.username = user_entry.username
     session.user.display_name = user_entry.display_name

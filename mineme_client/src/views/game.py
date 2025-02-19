@@ -6,7 +6,7 @@ from mineme_client.src.commands.cmd_quit import cmd_quit
 from mineme_client.src.commands.cmd_clear import cmd_clear
 from mineme_client.src.commands.cmd_join import cmd_leave
 
-from mineme_client.src.commands.cmd_balance import cmd_check_balance
+from mineme_client.src.commands.cmd_balance import cmd_balance
 from mineme_client.src.commands.cmd_mine import cmd_mine
 from mineme_client.src.commands.cmd_gamble import cmd_gamble
 from mineme_client.src.commands.cmd_ore import cmd_ore
@@ -34,7 +34,7 @@ class GameView(View):
 
         self.register_command("leave", lambda _: cmd_leave(self.context))
 
-        self.register_command("balance", lambda _: cmd_check_balance(self.context))
+        self.register_command("balance", lambda _: cmd_balance(self.context))
         self.register_command("mine", lambda _: cmd_mine(self.context))
         self.register_command("gamble", lambda _: cmd_gamble(self.context))
         self.register_command("ore", lambda _: cmd_ore(self.context))

@@ -9,6 +9,8 @@ type session_token = str
 
 @dataclass
 class SessionData:
+    address: str = ''
+    notification_queue: list[str] = field(default_factory=list)
     user: User = field(default_factory=User)
     authenticated: bool = False
     command_cooldowns: CommandCooldown = field(default_factory=CommandCooldown)

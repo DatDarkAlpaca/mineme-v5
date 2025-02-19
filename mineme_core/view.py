@@ -1,9 +1,17 @@
+import time
+from queue import Queue
+from threading import Thread
 from typing import Callable, Protocol
 
 
 class View(Protocol):
     def __init__(self):
         self.command_list: dict = {}
+        self.tasks = Queue()
+        
+        self.event_thread = Thread(target=lambda: self.__execute_tasks(), daemon=True)
+        self.event_thread.start()
+
         self.handler = None
 
     def display_header(self): ...
@@ -12,12 +20,13 @@ class View(Protocol):
 
     def on_view_startup(self): ...
 
-    def on_update(self): ...
-
     def on_view_shutdown(self): ...
 
     def register_command(self, command_name: str, function: Callable):
         self.command_list[command_name] = function
+
+    def register_task(self, function: Callable, cooldown: int):
+        self.tasks.put((function, cooldown))
 
     def handle_command(self, command: str, args: list) -> bool:
         command_function = self.command_list.get(command)
@@ -30,6 +39,12 @@ class View(Protocol):
     def _set_handler(self, handler):
         self.handler = handler
 
+    def __execute_tasks(self):
+        while True:
+            function, cooldown = self.tasks.get(block=True)
+            function()
+            self.tasks.put((function, cooldown))
+            time.sleep(cooldown)
 
 class ViewHandler:
     def __init__(self):
@@ -59,6 +74,3 @@ class ViewHandler:
 
     def on_render(self):
         self.current_view.on_render()
-
-    def on_update(self):
-        self.current_view.on_update()
