@@ -7,3 +7,5 @@ from callbacks.callback_gamble import gamble_callback
 from callbacks.callback_mine import mine_callback
 from callbacks.callback_ore import ore_callback
 from callbacks.callback_pay import pay_callback
+
+from callbacks.callback_notifications import notifications_callback

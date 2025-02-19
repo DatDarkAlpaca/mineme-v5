@@ -4,7 +4,6 @@ from mineme_core.constants import LOGO_FILE
 from mineme_core.utils.file import read_file
 
 from context import ClientContext
-from tasks import handle_notifications
 from commands import cmd_quit, cmd_clear, cmd_register, cmd_join
 
 
@@ -17,9 +16,6 @@ class WelcomeView(View):
 
     def on_startup(self):
         self.logo = read_file(LOGO_FILE)
-
-        # self.register_task(lambda: handle_notifications(self.context), 5)
-        # self.register_task(lambda: example(), 1)
 
         self.register_command("quit", lambda _: cmd_quit(self.context))
         self.register_command("cls", lambda _: cmd_clear(self.context))
@@ -34,7 +30,10 @@ class WelcomeView(View):
         print(_tr("Use the 'join' command to enter the game"))
 
     def on_render(self):
+        self.context.console.set_cursor_bottom()
         self.context.console.get_input()
+        self.context.console.reset_cursor()
+
         self.context.console.clear_terminal()
         self.display_header()
 

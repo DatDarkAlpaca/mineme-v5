@@ -11,6 +11,5 @@ class Application:
     def run(self):
         while self.context.running:
             self.context.view_handler.on_render()
-            self.context.view_handler.on_update()
 
         send_leave_packet(self.context)

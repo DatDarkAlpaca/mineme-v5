@@ -28,6 +28,9 @@ class View(Protocol):
     def register_task(self, function: Callable, cooldown: int):
         self.tasks.put((function, cooldown))
 
+    def clear_tasks(self):
+        self.tasks = Queue()
+
     def handle_command(self, command: str, args: list) -> bool:
         command_function = self.command_list.get(command)
         if not command_function:

@@ -16,6 +16,7 @@ from callbacks import (
     mine_callback,
     ore_callback,
     pay_callback,
+    notifications_callback
 )
 from utils.packet_utils import *
 
@@ -48,7 +49,12 @@ class ServerApp:
             if command.startswith('notify'):
                 
                 session_token = command.split(' ')[1]
-                message = command.split(' ')[2:]
+                message = ''.join(command.split(' ')[2:])
+            
+                if session_token == '*':
+                    for _, session in self.context.session_data.items():
+                        session.notification_queue.append(message)
+                    continue
 
                 session = self.context.session_data.get(session_token)
                 if not session:
@@ -103,24 +109,21 @@ class ServerApp:
             time.sleep(1.0)
 
     def __initialize_server_data(self):
-        # Authentication:
         packet_handler = self.context.packet_handler
+        
+        packet_handler.register(
+            PacketType.POLL_NOTIFICATION,
+            lambda packet_result: notifications_callback(self.context, packet_result),
+        )
+
         packet_handler.register_on_execute(
             lambda packet_result: self.__handle_command_cooldown(packet_result)
         )
 
+        # Authentication:
         packet_handler.register(
             PacketType.REGISTER_USER,
             lambda packet_result: register_callback(self.context, packet_result),
-        )
-
-        def poll_notification(packet_result):
-            self.context.session_data.get()
-            pass
-
-        packet_handler.register(
-            PacketType.POLL_NOTIFICATION,
-            poll_notification
         )
 
         packet_handler.register(
@@ -159,6 +162,7 @@ class ServerApp:
             PacketType.REGISTER_USER,
             PacketType.JOIN_USER,
             PacketType.LEAVE_USER,
+            PacketType.POLL_NOTIFICATION,
         ]:
             return True
 
