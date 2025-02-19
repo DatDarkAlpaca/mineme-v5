@@ -6,4 +6,4 @@ def initialize_environment(filepath: str = None):
         filepath = find_dotenv()
 
     if not load_dotenv(filepath):
-        print('Failed to load .env file')
+        print("Failed to load .env file")
