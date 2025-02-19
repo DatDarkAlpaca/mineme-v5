@@ -23,7 +23,7 @@ def ore_callback(context: ServerContext, packet_result: RecvPacket):
             if ore.category_id == category_data.id:
                 category_name = category_data.name
 
-    except:
+    except Exception:
         data = {"reason": "invalid ore name"}
         return server_socket.send(Packet(PacketType.INVALID, data), address)
 

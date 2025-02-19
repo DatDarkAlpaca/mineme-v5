@@ -4,10 +4,10 @@ from dataclasses import dataclass, field
 from psycopg2.extensions import cursor, connection
 
 from database_data import DatabaseData
-from mineme_server.src.session_data import *
-from mineme_core.network.packet_handler import *
 from mineme_core.network.ssp_protocol import SSP_Protocol
+from mineme_core.network.packet_handler import PacketHandler
 from mineme_core.database.database import create_database_connection
+from mineme_server.src.session_data import SessionData, session_token
 from mineme_core.network.command_cooldown import CommandCooldownTable
 
 from server_socket import ServerSocket

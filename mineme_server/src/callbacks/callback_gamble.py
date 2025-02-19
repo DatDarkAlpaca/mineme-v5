@@ -1,11 +1,11 @@
 import random
 from math import sqrt
 
+from mineme_core.constants import CURRENCY_SYMBOL
 from mineme_core.network.packet import Packet, RecvPacket, PacketType
 
-from utils.packet_utils import send_invalid_session_packet
-from mineme_core.constants import *
 from context import ServerContext
+from utils.packet_utils import send_invalid_session_packet
 
 
 def gamble_callback(context: ServerContext, packet_result: RecvPacket):
@@ -29,7 +29,7 @@ def gamble_callback(context: ServerContext, packet_result: RecvPacket):
     try:
         amount = float(packet_result.packet.data.get("amount"))
         multiplier = float(packet_result.packet.data.get("multiplier"))
-    except:
+    except Exception:
         return send_invalid_args()
 
     if not amount or not multiplier:

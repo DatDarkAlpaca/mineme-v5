@@ -25,7 +25,7 @@ def pay_callback(context: ServerContext, packet_result: RecvPacket):
     try:
         username = packet_result.packet.data.get("username")
         amount = float(packet_result.packet.data.get("amount"))
-    except:
+    except Exception:
         return send_invalid_args()
 
     if not amount or not username:
