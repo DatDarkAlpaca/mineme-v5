@@ -46,8 +46,16 @@ class ServerApp:
             if command in ["quit", "exit", "q", "e"]:
                 return
             
-            if command.startswith('notify'):
+            if command.startswith('kick'):
+                session_token = command.split(' ')[1]
+
+                session = self.context.session_data.get(session_token)
+                if not session:
+                    continue
                 
+                self.context.session_data.pop(session_token)                
+
+            if command.startswith('notify'):
                 session_token = command.split(' ')[1]
                 message = ''.join(command.split(' ')[2:])
             
