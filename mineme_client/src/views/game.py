@@ -2,15 +2,17 @@ from mineme_core.view import View
 from mineme_core.constants import LOGO_FILE
 from mineme_core.utils.file import read_file
 
-from mineme_client.src.commands.cmd_quit import cmd_quit
-from mineme_client.src.commands.cmd_clear import cmd_clear
-from mineme_client.src.commands.cmd_join import cmd_leave
-
-from mineme_client.src.commands.cmd_balance import cmd_balance
-from mineme_client.src.commands.cmd_mine import cmd_mine
-from mineme_client.src.commands.cmd_gamble import cmd_gamble
-from mineme_client.src.commands.cmd_ore import cmd_ore
-from mineme_client.src.commands.cmd_pay import cmd_pay
+from commands import (
+    cmd_quit, 
+    cmd_clear, 
+    cmd_leave, 
+    cmd_balance, 
+    cmd_mine,
+    cmd_gamble,
+    cmd_history,
+    cmd_ore,
+    cmd_pay
+)
 
 from tasks import handle_notifications
 from context import ClientContext
@@ -29,9 +31,12 @@ class GameView(View):
     def on_startup(self):
         self.logo = read_file(LOGO_FILE)
 
+        self.register_on_execute(lambda command, args: self.context.command_history.append(command, args))
+
         self.register_command("quit", lambda _: cmd_quit(self.context))
         self.register_command("cls", lambda _: cmd_clear(self.context))
         self.register_command("clear", lambda _: cmd_clear(self.context))
+        self.register_command("history", lambda _: cmd_history(self.context))
 
         self.register_command("leave", lambda _: cmd_leave(self.context))
 

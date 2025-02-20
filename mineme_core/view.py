@@ -6,6 +6,7 @@ from typing import Callable, Protocol
 
 class View(Protocol):
     def __init__(self):
+        self.on_execute_function_list: list = []
         self.command_list: dict = {}
         self.tasks = Queue()
         
@@ -22,6 +23,9 @@ class View(Protocol):
 
     def on_view_shutdown(self): ...
 
+    def register_on_execute(self, function: Callable):
+        self.on_execute_function_list.append(function)
+
     def register_command(self, command_name: str, function: Callable):
         self.command_list[command_name] = function
 
@@ -35,6 +39,9 @@ class View(Protocol):
         command_function = self.command_list.get(command)
         if not command_function:
             return False
+
+        for function in self.on_execute_function_list:
+            function(command, args)
 
         command_function(args)
         return True
