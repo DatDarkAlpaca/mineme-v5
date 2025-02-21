@@ -29,13 +29,13 @@ class SessionHandler:
 
     def get(self, token: session_token):
         return self.sessions.get(token)
-        
+
     def items(self):
         return self.sessions.items()
 
     def remove(self, token: session_token):
         return self.sessions.pop(token)
-    
+
     def remove_from_address(self, address):
         session_token = None
         for token, session in self.sessions.items():
@@ -44,7 +44,6 @@ class SessionHandler:
                 break
 
         self.remove(session_token)
-            
+
     def __len__(self):
         return len(self.sessions)
-        

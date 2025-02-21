@@ -1,4 +1,3 @@
-
 from mineme_core.network.packet import Packet, PacketType
 from mineme_core.localization import _tr
 
@@ -23,8 +22,8 @@ def cmd_register(context: ClientContext):
     data = {"username": username, "password": password}
 
     if not client_socket.send(Packet(PacketType.REGISTER_USER, data)):
-        return print('Connection timed out. Please try again later')
-    
+        return print("Connection timed out. Please try again later")
+
     packet_result = client_socket.receive()
 
     if not packet_result.is_valid():

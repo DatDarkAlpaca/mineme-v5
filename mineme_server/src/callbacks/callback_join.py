@@ -12,7 +12,9 @@ def create_session_token() -> str:
     return str(uuid.uuid4())
 
 
-def join_callback(context: ServerContext, client_socket: MineSocket, packet_result: Packet):
+def join_callback(
+    context: ServerContext, client_socket: MineSocket, packet_result: Packet
+):
     user_table = context.database_data.user_table
     session_handler = context.session_handler
 

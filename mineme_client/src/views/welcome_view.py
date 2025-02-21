@@ -30,7 +30,7 @@ class WelcomeView(View):
         print(_tr("Use the 'join' command to enter the game"))
 
         if not self.context.client_socket.connect():
-            print('Failed to connect to server. Run any commands to retry.')
+            print("Failed to connect to server. Run any commands to retry.")
 
     def on_render(self):
         self.context.console.set_cursor_bottom()

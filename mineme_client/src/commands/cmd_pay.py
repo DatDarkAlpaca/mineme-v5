@@ -28,7 +28,7 @@ def cmd_pay(context: ClientContext):
     }
 
     if not client_socket.send(Packet(PacketType.PAY, data)):
-        return print('Connection timed out. Please try again later')
+        return print("Connection timed out. Please try again later")
 
     packet_result = client_socket.receive()
     if not packet_result.is_valid():

@@ -27,9 +27,9 @@ def cmd_mine(context: ClientContext):
         return print("Attempting to reconnect to server. Please try again.")
 
     data = {"session_token": context.session_token}
-    
+
     if not client_socket.send(Packet(PacketType.MINE, data)):
-        return print('Connection timed out. Please try again later')
+        return print("Connection timed out. Please try again later")
 
     packet_result = client_socket.receive()
     if not packet_result.is_valid():

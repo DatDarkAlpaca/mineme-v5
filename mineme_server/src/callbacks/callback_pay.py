@@ -4,13 +4,15 @@ from mineme_core.network.packet import Packet, PacketType
 
 from context import ServerContext
 from utils.packet_utils import (
-    send_invalid_session_packet, 
+    send_invalid_session_packet,
     send_unauthenticated_packet,
-    is_user_authenticated
+    is_user_authenticated,
 )
 
 
-def pay_callback(context: ServerContext, client_socket: MineSocket, packet_result: Packet):
+def pay_callback(
+    context: ServerContext, client_socket: MineSocket, packet_result: Packet
+):
     user_table = context.database_data.user_table
     player_table = context.database_data.player_table
 
@@ -59,6 +61,8 @@ def pay_callback(context: ServerContext, client_socket: MineSocket, packet_resul
     # send a notification to the receiver:
     for _, receiver_session in context.session_handler.items():
         if receiver_session.user.username == username:
-            receiver_session.notification_queue.append(f"{session.user.display_name} sent you {CURRENCY_SYMBOL}{amount:.2f}")
+            receiver_session.notification_queue.append(
+                f"{session.user.display_name} sent you {CURRENCY_SYMBOL}{amount:.2f}"
+            )
 
     client_socket.send(Packet(PacketType.PAY, {}))

@@ -9,3 +9,16 @@ from callbacks.callback_ore import ore_callback
 from callbacks.callback_pay import pay_callback
 
 from callbacks.callback_notifications import notifications_callback
+
+
+__all__ = [
+    register_callback,
+    join_callback,
+    leave_callback,
+    balance_callback,
+    gamble_callback,
+    mine_callback,
+    ore_callback,
+    pay_callback,
+    notifications_callback,
+]

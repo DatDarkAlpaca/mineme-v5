@@ -4,13 +4,15 @@ from mineme_core.network.packet import Packet, PacketType
 
 from context import ServerContext
 from utils.packet_utils import (
-    send_invalid_session_packet, 
+    send_invalid_session_packet,
     send_unauthenticated_packet,
-    is_user_authenticated
+    is_user_authenticated,
 )
 
 
-def mine_callback(context: ServerContext, client_socket: MineSocket, packet_result: Packet):
+def mine_callback(
+    context: ServerContext, client_socket: MineSocket, packet_result: Packet
+):
     player_table = context.database_data.player_table
     ores = context.database_data.ores
 
@@ -22,7 +24,6 @@ def mine_callback(context: ServerContext, client_socket: MineSocket, packet_resu
 
     if not is_user_authenticated(context.session_handler, packet_result):
         return send_unauthenticated_packet(client_socket)
-
 
     uid = session.user.uid
     player = player_table.fetch_player(uid)

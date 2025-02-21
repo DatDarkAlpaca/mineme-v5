@@ -15,12 +15,9 @@ from callbacks import (
     mine_callback,
     ore_callback,
     pay_callback,
-    notifications_callback
+    notifications_callback,
 )
-from utils.packet_utils import (
-    send_invalid_session_packet,
-    send_delayed_command_packet
-)
+from utils.packet_utils import send_invalid_session_packet, send_delayed_command_packet
 
 
 class ServerApp:
@@ -31,31 +28,35 @@ class ServerApp:
     def initialize(self):
         self.initialize_packet_handler()
 
-        thread = Thread(target=lambda: self.context.server_socket.execute(), daemon=True)
+        thread = Thread(
+            target=lambda: self.context.server_socket.execute(), daemon=True
+        )
         thread.start()
-    
+
     def run(self):
-        print(f"Initialized server at {self.context.server_socket.host}:{self.context.server_socket.port}.")
+        print(
+            f"Initialized server at {self.context.server_socket.host}:{self.context.server_socket.port}."
+        )
         while True:
             command = input("> ").lower()
 
             if command in ["quit", "exit", "q", "e"]:
                 return
-            
-            if command.startswith('kick'):
-                session_token = command.split(' ')[1]
+
+            if command.startswith("kick"):
+                session_token = command.split(" ")[1]
 
                 session = self.context.session_handler.get(session_token)
                 if not session:
                     continue
-                
+
                 self.context.session_handler.remove(session_token)
 
-            elif command.startswith('notify'):
-                session_token = command.split(' ')[1]
-                message = ''.join(command.split(' ')[2:])
-            
-                if session_token == '*':
+            elif command.startswith("notify"):
+                session_token = command.split(" ")[1]
+                message = "".join(command.split(" ")[2:])
+
+                if session_token == "*":
                     for _, session in self.context.session_handler.items():
                         session.notification_queue.append(message)
                     continue
@@ -63,9 +64,9 @@ class ServerApp:
                 session = self.context.session_handler.get(session_token)
                 if not session:
                     continue
-                
+
                 session.notification_queue.append(message)
-            
+
             elif command.startswith("list"):
                 print("Session list:")
                 for session_token, session in self.context.session_handler.items():
@@ -77,49 +78,74 @@ class ServerApp:
 
     def initialize_packet_handler(self):
         packet_handler = self.context.packet_handler
-        
+
         packet_handler.register(
             PacketType.POLL_NOTIFICATION,
-            lambda client_socket, packet_result: notifications_callback(self.context, client_socket, packet_result),
+            lambda client_socket, packet_result: notifications_callback(
+                self.context, client_socket, packet_result
+            ),
         )
         packet_handler.register_on_execute(
-            lambda client_socket, packet_result: self.__handle_command_cooldown(client_socket, packet_result)
+            lambda client_socket, packet_result: self.__handle_command_cooldown(
+                client_socket, packet_result
+            )
         )
 
         # Authentication:
         packet_handler.register(
             PacketType.REGISTER_USER,
-            lambda client_socket, packet_result: register_callback(self.context, client_socket, packet_result),
+            lambda client_socket, packet_result: register_callback(
+                self.context, client_socket, packet_result
+            ),
         )
         packet_handler.register(
             PacketType.JOIN_USER,
-            lambda client_socket, packet_result: join_callback(self.context, client_socket, packet_result),
+            lambda client_socket, packet_result: join_callback(
+                self.context, client_socket, packet_result
+            ),
         )
         packet_handler.register(
             PacketType.LEAVE_USER,
-            lambda client_socket, packet_result: leave_callback(self.context, client_socket, packet_result),
+            lambda client_socket, packet_result: leave_callback(
+                self.context, client_socket, packet_result
+            ),
         )
 
         # Game:
         packet_handler.register(
             PacketType.CHECK_BALANCE,
-            lambda client_socket, packet_result: balance_callback(self.context, client_socket, packet_result),
+            lambda client_socket, packet_result: balance_callback(
+                self.context, client_socket, packet_result
+            ),
         )
         packet_handler.register(
-            PacketType.MINE, lambda client_socket, packet_result: mine_callback(self.context, client_socket, packet_result)
+            PacketType.MINE,
+            lambda client_socket, packet_result: mine_callback(
+                self.context, client_socket, packet_result
+            ),
         )
         packet_handler.register(
-            PacketType.GAMBLE, lambda client_socket, packet_result: gamble_callback(self.context, client_socket, packet_result)
+            PacketType.GAMBLE,
+            lambda client_socket, packet_result: gamble_callback(
+                self.context, client_socket, packet_result
+            ),
         )
         packet_handler.register(
             PacketType.ORE,
-            lambda client_socket, packet_result: ore_callback(self.context, client_socket, packet_result),
+            lambda client_socket, packet_result: ore_callback(
+                self.context, client_socket, packet_result
+            ),
         )
         packet_handler.register(
-            PacketType.PAY, lambda client_socket, packet_result: pay_callback(self.context, client_socket, packet_result)
+            PacketType.PAY,
+            lambda client_socket, packet_result: pay_callback(
+                self.context, client_socket, packet_result
+            ),
         )
 
-    def __handle_command_cooldown(self, client_socket: MineSocket, packet_result: Packet) -> bool:
+    def __handle_command_cooldown(
+        self, client_socket: MineSocket, packet_result: Packet
+    ) -> bool:
         type = packet_result.type
 
         if type in [

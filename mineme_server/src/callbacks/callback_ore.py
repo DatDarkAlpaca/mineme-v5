@@ -3,7 +3,9 @@ from mineme_core.network.packet import Packet, PacketType
 from context import ServerContext
 
 
-def ore_callback(context: ServerContext, client_socket: MineSocket, packet_result: Packet):
+def ore_callback(
+    context: ServerContext, client_socket: MineSocket, packet_result: Packet
+):
     ores = context.database_data.ores
     categories = context.database_data.ore_categories
 

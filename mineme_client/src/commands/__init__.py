@@ -8,3 +8,18 @@ from commands.cmd_ore import cmd_ore
 from commands.cmd_pay import cmd_pay
 from commands.cmd_quit import cmd_quit
 from commands.cmd_register import cmd_register
+
+
+__all__ = [
+    cmd_balance,
+    cmd_clear,
+    cmd_gamble,
+    cmd_history,
+    cmd_join,
+    cmd_leave,
+    cmd_mine,
+    cmd_ore,
+    cmd_pay,
+    cmd_quit,
+    cmd_register,
+]

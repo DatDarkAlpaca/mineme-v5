@@ -3,15 +3,15 @@ from mineme_core.constants import LOGO_FILE
 from mineme_core.utils.file import read_file
 
 from commands import (
-    cmd_quit, 
-    cmd_clear, 
-    cmd_leave, 
-    cmd_balance, 
+    cmd_quit,
+    cmd_clear,
+    cmd_leave,
+    cmd_balance,
     cmd_mine,
     cmd_gamble,
     cmd_history,
     cmd_ore,
-    cmd_pay
+    cmd_pay,
 )
 
 from tasks import handle_notifications
@@ -31,7 +31,9 @@ class GameView(View):
     def on_startup(self):
         self.logo = read_file(LOGO_FILE)
 
-        self.register_on_execute(lambda command, args: self.context.command_history.append(command, args))
+        self.register_on_execute(
+            lambda command, args: self.context.command_history.append(command, args)
+        )
 
         self.register_command("quit", lambda _: cmd_quit(self.context))
         self.register_command("cls", lambda _: cmd_clear(self.context))
@@ -83,5 +85,5 @@ class GameView(View):
         print(f"{self.logo}\n")
         print(f"* Logged in: {self.display_name}")
 
-        lines_used = self.logo.count('\n') + 2
+        lines_used = self.logo.count("\n") + 2
         self.context.console.set_last_line(lines_used)

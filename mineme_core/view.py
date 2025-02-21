@@ -9,7 +9,7 @@ class View(Protocol):
         self.on_execute_function_list: list = []
         self.command_list: dict = {}
         self.tasks = Queue()
-        
+
         self.event_thread = Thread(target=lambda: self.__execute_tasks(), daemon=True)
         self.event_thread.start()
 
@@ -55,6 +55,7 @@ class View(Protocol):
             function()
             self.tasks.put((function, cooldown))
             time.sleep(cooldown)
+
 
 class ViewHandler:
     def __init__(self):

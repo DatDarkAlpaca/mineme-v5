@@ -25,7 +25,7 @@ class Packet:
 
     def is_valid(self) -> bool:
         return self.type and self.type != PacketType.INVALID
-    
+
     def get_reason(self) -> str:
         return self.data.get("reason", "server possibly disconnected")
 

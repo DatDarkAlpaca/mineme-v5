@@ -30,7 +30,7 @@ def cmd_gamble(context: ClientContext):
         "session_token": context.session_token,
     }
     if not client_socket.send(Packet(PacketType.GAMBLE, data)):
-        return print('Connection timed out. Please try again later')
+        return print("Connection timed out. Please try again later")
 
     packet_result = client_socket.receive()
     if not packet_result.is_valid():

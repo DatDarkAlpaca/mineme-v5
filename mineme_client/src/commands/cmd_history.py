@@ -4,10 +4,10 @@ from context import ClientContext
 def cmd_history(context: ClientContext):
     history = context.command_history.history
     args = context.console.arguments
-    
+
     if len(args) >= 1:
         subcommand = args[0].lower()
-        if subcommand == 'clear':
+        if subcommand == "clear":
             history.clear()
             return print("Cleared command history")
 

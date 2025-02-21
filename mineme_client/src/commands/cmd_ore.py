@@ -16,9 +16,9 @@ def cmd_ore(context: ClientContext):
     ore_name = args[0].lower()
 
     data = {"session_token": context.session_token, "ore_name": ore_name}
-    
+
     if not client_socket.send(Packet(PacketType.ORE, data)):
-        return print('Connection timed out. Please try again later')
+        return print("Connection timed out. Please try again later")
 
     packet_result = client_socket.receive()
     if not packet_result.is_valid():

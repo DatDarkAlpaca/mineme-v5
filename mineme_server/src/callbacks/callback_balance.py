@@ -3,12 +3,15 @@ from mineme_core.network.packet import Packet, PacketType
 
 from context import ServerContext
 from utils.packet_utils import (
-    send_invalid_session_packet, 
+    send_invalid_session_packet,
     send_unauthenticated_packet,
-    is_user_authenticated
+    is_user_authenticated,
 )
 
-def balance_callback(context: ServerContext, client_socket: MineSocket, packet_result: Packet):
+
+def balance_callback(
+    context: ServerContext, client_socket: MineSocket, packet_result: Packet
+):
     player_table = context.database_data.player_table
 
     session_token = packet_result.get_session_token()

@@ -4,10 +4,15 @@ from mineme_core.network.packet import Packet, PacketType
 from session_data import SessionHandler
 
 
-def is_user_authenticated(session_handler: SessionHandler, packet_result: Packet) -> bool:
+def is_user_authenticated(
+    session_handler: SessionHandler, packet_result: Packet
+) -> bool:
     session_token = packet_result.get_session_token()
-    return session_handler.get(session_token) and session_handler.get(session_token).authenticated
-    
+    return (
+        session_handler.get(session_token)
+        and session_handler.get(session_token).authenticated
+    )
+
 
 def send_invalid_session_packet(client_socket: MineSocket):
     data = {"reason": "invalid session | you were timed out | please log in again"}

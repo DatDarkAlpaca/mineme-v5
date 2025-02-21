@@ -22,8 +22,8 @@ def cmd_join(context: ClientContext):
     data = {"username": username, "password": password}
 
     if not client_socket.send(Packet(PacketType.JOIN_USER, data)):
-        return print('A connection error has occurred. Please try again later')
-    
+        return print("A connection error has occurred. Please try again later")
+
     packet_result = client_socket.receive()
     if not packet_result.is_valid():
         return print(

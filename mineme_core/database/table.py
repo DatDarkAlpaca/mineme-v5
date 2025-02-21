@@ -27,7 +27,7 @@ class Table:
                 f"INSERT INTO {self.table_name} ({fields_string}) VALUES ({values_string})",
                 (*values,),
             )
-        except:
+        except Exception:
             return False
 
         return True

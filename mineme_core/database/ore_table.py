@@ -1,4 +1,4 @@
-from mineme_core.database.table import *
+from mineme_core.database.table import Table, TableField, cursor
 from mineme_core.game.ore import Ore
 
 

@@ -2,8 +2,6 @@ import os
 import psycopg2
 from psycopg2.extensions import connection
 
-from mineme_core.constants import *
-
 
 def create_database_connection() -> connection:
     database_name = os.environ.get("DATABASE_NAME")

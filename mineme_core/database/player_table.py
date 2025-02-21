@@ -1,5 +1,5 @@
 from mineme_core.game.player import Player
-from mineme_core.database.table import *
+from mineme_core.database.table import Table, TableField, cursor
 
 
 class PlayerTable(Table):
@@ -17,7 +17,7 @@ class PlayerTable(Table):
             self.cursor.execute(
                 "INSERT INTO players (uid, balance) VALUES (%s, %s)", (uid, balance)
             )
-        except:
+        except Exception:
             return False
         return True
 

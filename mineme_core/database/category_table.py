@@ -1,4 +1,5 @@
-from mineme_core.database.table import *
+from dataclasses import dataclass
+from mineme_core.database.table import Table, TableField, cursor
 
 
 @dataclass

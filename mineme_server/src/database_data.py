@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from mineme_core.database.user_table import UserTable
 from mineme_core.database.ore_table import Ore, OreTable
 from mineme_core.database.player_table import PlayerTable
-from mineme_core.database.category_table import OreCategory, OreCategoryTable 
+from mineme_core.database.category_table import OreCategory, OreCategoryTable
 
 
 @dataclass

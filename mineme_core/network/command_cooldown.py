@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from mineme_core.network.packet import *
+from mineme_core.network.packet import PacketType
 
 
 class CommandCooldown:
@@ -17,7 +17,7 @@ class CommandCooldown:
     def get_cooldown(self, type: PacketType) -> datetime:
         try:
             return self.cooldown_table[type]
-        except:
+        except Exception:
             print(f"Error: unregistered packet type cooldown: {type}")
 
 

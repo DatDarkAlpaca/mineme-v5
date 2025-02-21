@@ -1,5 +1,5 @@
-from mineme_core.database.table import *
-from mineme_core.game.user import *
+from mineme_core.database.table import cursor, TableField, Table
+from mineme_core.game.user import User
 import bcrypt
 
 
@@ -35,7 +35,7 @@ class UserTable(Table):
             self.insert_entry(
                 entry.uid, entry.username, entry.display_name, entry.password
             )
-        except:
+        except Exception:
             return False
         return True
 

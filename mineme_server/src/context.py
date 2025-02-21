@@ -32,7 +32,7 @@ class ServerContext:
             int(os.environ.get("SERVER_PORT")),
             ssp_protocol,
             self.packet_handler,
-            self.session_handler
+            self.session_handler,
         )
 
         self.db_connection = create_database_connection()

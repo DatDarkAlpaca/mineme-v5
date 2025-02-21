@@ -8,7 +8,9 @@ from mineme_core.network.packet import Packet, PacketType
 from context import ServerContext
 
 
-def register_callback(context: ServerContext, client_socket: MineSocket, packet_result: Packet):
+def register_callback(
+    context: ServerContext, client_socket: MineSocket, packet_result: Packet
+):
     user_table = context.database_data.user_table
     player_table = context.database_data.player_table
 
@@ -37,7 +39,9 @@ def register_callback(context: ServerContext, client_socket: MineSocket, packet_
         return client_socket.send(Packet(PacketType.INVALID, data))
 
     # password:
-    hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt=bcrypt.gensalt()).decode()
+    hashed_password = bcrypt.hashpw(
+        password.encode("utf-8"), salt=bcrypt.gensalt()
+    ).decode()
 
     entry = User(str(uuid.uuid4()), username, username, hashed_password)
     if not user_table.insert_user(entry):
