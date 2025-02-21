@@ -7,9 +7,9 @@ from database_data import DatabaseData
 from mineme_core.network.ssp_protocol import SSP_Protocol
 from mineme_core.network.packet_handler import PacketHandler
 from mineme_core.database.database import create_database_connection
-from mineme_server.src.session_data import SessionData, session_token
 from mineme_core.network.command_cooldown import CommandCooldownTable
 
+from session_data import SessionHandler
 from server_socket import ServerSocket
 
 
@@ -17,7 +17,7 @@ from server_socket import ServerSocket
 class ServerContext:
     server_socket: ServerSocket | None = None
     packet_handler: PacketHandler = field(default_factory=PacketHandler)
-    session_data: dict[session_token, SessionData] = field(default_factory=dict)
+    session_handler: SessionHandler = field(default_factory=SessionHandler)
 
     cooldown_table: CommandCooldownTable = field(default_factory=CommandCooldownTable)
 
@@ -31,6 +31,8 @@ class ServerContext:
             os.environ.get("SERVER_ADDRESS"),
             int(os.environ.get("SERVER_PORT")),
             ssp_protocol,
+            self.packet_handler,
+            self.session_handler
         )
 
         self.db_connection = create_database_connection()

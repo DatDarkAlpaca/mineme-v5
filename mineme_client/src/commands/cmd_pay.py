@@ -8,13 +8,17 @@ def cmd_pay(context: ClientContext):
     args = context.console.arguments
     client_socket = context.client_socket
 
+    if not client_socket.connected:
+        client_socket.connect()
+        return print("Attempting to reconnect to server. Please try again.")
+
     if len(args) < 2:
         return print("Usage: pay <username> <amount>")
 
     try:
         username = args[0].lower()
         amount = float(args[1].lower())
-    except:
+    except Exception:
         return print("Usage: pay <username> <amount>")
 
     data = {
@@ -22,7 +26,9 @@ def cmd_pay(context: ClientContext):
         "username": username,
         "amount": amount,
     }
-    client_socket.send(Packet(PacketType.PAY, data))
+
+    if not client_socket.send(Packet(PacketType.PAY, data)):
+        return print('Connection timed out. Please try again later')
 
     packet_result = client_socket.receive()
     if not packet_result.is_valid():

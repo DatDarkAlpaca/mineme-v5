@@ -8,6 +8,10 @@ def cmd_gamble(context: ClientContext):
     args: list = context.console.arguments
     client_socket = context.client_socket
 
+    if not client_socket.connected:
+        client_socket.connect()
+        return print("Attempting to reconnect to server. Please try again.")
+
     if len(args) == 0:
         return print("usage: gamble <amount> <multiplier=2.0>")
 
@@ -17,7 +21,7 @@ def cmd_gamble(context: ClientContext):
     if len(args) >= 2:
         try:
             multiplier = float(args[1])
-        except:
+        except Exception:
             return print("usage: gamble <amount> <multiplier=2.0>")
 
     data = {
@@ -25,7 +29,8 @@ def cmd_gamble(context: ClientContext):
         "multiplier": multiplier,
         "session_token": context.session_token,
     }
-    client_socket.send(Packet(PacketType.GAMBLE, data))
+    if not client_socket.send(Packet(PacketType.GAMBLE, data)):
+        return print('Connection timed out. Please try again later')
 
     packet_result = client_socket.receive()
     if not packet_result.is_valid():
@@ -33,7 +38,7 @@ def cmd_gamble(context: ClientContext):
             f"usage: gamble <amount> <multiplier> | {packet_result.get_reason()}"
         )
 
-    win = packet_result.packet.data["win"]
+    win = packet_result.data["win"]
 
     if win == 1:
         return print(

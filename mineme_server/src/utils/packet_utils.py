@@ -1,24 +1,24 @@
-from session_data import SessionData, session_token
-from server_socket import ServerSocket
-from mineme_core.network.packet import Packet, PacketType, RecvPacket
+from mineme_core.network.mine_socket import MineSocket
+from mineme_core.network.packet import Packet, PacketType
+
+from session_data import SessionHandler
 
 
-def is_user_authenticated(session_data: dict[session_token, SessionData], packet_result: RecvPacket) -> bool:
+def is_user_authenticated(session_handler: SessionHandler, packet_result: Packet) -> bool:
     session_token = packet_result.get_session_token()
-    return session_data.get(session_token) and session_data[session_token].authenticated
+    return session_handler.get(session_token) and session_handler.get(session_token).authenticated
     
 
-def send_invalid_session_packet(server_socket: ServerSocket, address):
+def send_invalid_session_packet(client_socket: MineSocket):
     data = {"reason": "invalid session | you were timed out | please log in again"}
-    server_socket.send(Packet(PacketType.INVALID, data), address)
+    client_socket.send(Packet(PacketType.INVALID, data))
 
 
-def send_delayed_command_packet(server_socket: ServerSocket, delay: float, address):
+def send_delayed_command_packet(client_socket: MineSocket, delay: float):
     data = {"reason": f"you must wait {delay:.2f}s to use this command again"}
+    client_socket.send(Packet(PacketType.INVALID, data))
 
-    server_socket.send(Packet(PacketType.INVALID, data), address)
 
-
-def send_unauthenticated_packet(server_socket: ServerSocket, address):
+def send_unauthenticated_packet(client_socket: MineSocket):
     data = {"reason": "user not authenticated"}
-    return server_socket.send(Packet(PacketType.INVALID, data), address)
+    return client_socket.send(Packet(PacketType.INVALID, data))

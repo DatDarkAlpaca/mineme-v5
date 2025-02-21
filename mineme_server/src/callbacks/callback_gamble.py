@@ -2,7 +2,8 @@ import random
 from math import sqrt
 
 from mineme_core.constants import CURRENCY_SYMBOL
-from mineme_core.network.packet import Packet, RecvPacket, PacketType
+from mineme_core.network.mine_socket import MineSocket
+from mineme_core.network.packet import Packet, PacketType
 
 from context import ServerContext
 from utils.packet_utils import (
@@ -12,30 +13,27 @@ from utils.packet_utils import (
 )
 
 
-def gamble_callback(context: ServerContext, packet_result: RecvPacket):
-    server_socket = context.server_socket
+def gamble_callback(context: ServerContext, client_socket: MineSocket, packet_result: Packet):
     player_table = context.database_data.player_table
 
-    address = packet_result.address
-
     session_token = packet_result.get_session_token()
-    session = context.session_data.get(session_token)
+    session = context.session_handler.get(session_token)
 
     if not session:
-        return send_invalid_session_packet(server_socket, address)
+        return send_invalid_session_packet(client_socket)
 
-    if not is_user_authenticated(context.session_data, packet_result):
-        return send_unauthenticated_packet(server_socket, address)
+    if not is_user_authenticated(context.session_handler, packet_result):
+        return send_unauthenticated_packet(client_socket)
 
     def send_invalid_args():
         data = {
             "reason": f"invalid arguments: amount={amount} | multiplier={multiplier}"
         }
-        return server_socket.send(Packet(PacketType.INVALID, data), address)
+        return client_socket.send(Packet(PacketType.INVALID, data))
 
     try:
-        amount = float(packet_result.packet.data.get("amount"))
-        multiplier = float(packet_result.packet.data.get("multiplier"))
+        amount = float(packet_result.data.get("amount"))
+        multiplier = float(packet_result.data.get("multiplier"))
     except Exception:
         return send_invalid_args()
 
@@ -44,7 +42,7 @@ def gamble_callback(context: ServerContext, packet_result: RecvPacket):
 
     if multiplier <= 1.0 or multiplier > 10.0:
         data = {"reason": "multipler must be greater than 1.0, and smaller than 10.0"}
-        return server_socket.send(Packet(PacketType.INVALID, data), address)
+        return client_socket.send(Packet(PacketType.INVALID, data))
 
     uid = session.user.uid
     balance = player_table.fetch_player(uid).balance
@@ -53,7 +51,7 @@ def gamble_callback(context: ServerContext, packet_result: RecvPacket):
         data = {
             "reason": f"you do not have the required funds to gamble. your current balance is: {CURRENCY_SYMBOL}{balance}"
         }
-        return server_socket.send(Packet(PacketType.INVALID, data), address)
+        return client_socket.send(Packet(PacketType.INVALID, data))
 
     odds = (sqrt(1 / 5) ** multiplier) * 100
     random_number = random.uniform(0, 100)
@@ -71,4 +69,4 @@ def gamble_callback(context: ServerContext, packet_result: RecvPacket):
 
     # packet:
     data = {"win": 1 if win else 0}
-    server_socket.send(Packet(PacketType.GAMBLE, data), address)
+    client_socket.send(Packet(PacketType.GAMBLE, data))

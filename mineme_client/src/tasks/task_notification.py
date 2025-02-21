@@ -13,7 +13,7 @@ def handle_notifications(context: ClientContext):
     if not packet_result.is_valid():
         return
     
-    messages = packet_result.packet.data['messages']
+    messages = packet_result.data['messages']
     if len(messages) == 0:
         return
     

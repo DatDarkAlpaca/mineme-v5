@@ -22,14 +22,20 @@ def get_size_modifier(weight: float, min_weight: float, max_weight: float):
 def cmd_mine(context: ClientContext):
     client_socket = context.client_socket
 
+    if not client_socket.connected:
+        client_socket.connect()
+        return print("Attempting to reconnect to server. Please try again.")
+
     data = {"session_token": context.session_token}
-    client_socket.send(Packet(PacketType.MINE, data))
+    
+    if not client_socket.send(Packet(PacketType.MINE, data)):
+        return print('Connection timed out. Please try again later')
 
     packet_result = client_socket.receive()
     if not packet_result.is_valid():
         return print(f"Usage: mine | {packet_result.get_reason()}")
 
-    data = packet_result.packet.data
+    data = packet_result.data
 
     ore_name = data["ore_name"]
     weight = data["weight"]

@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 
 class PacketType(Enum):
-    INVALID = 0
+    INVALID = auto()
 
     REGISTER_USER = auto()
     JOIN_USER = auto()
@@ -23,17 +23,11 @@ class Packet:
     type: PacketType = PacketType.INVALID
     data: dict = field(default_factory=dict)
 
-
-@dataclass
-class RecvPacket:
-    packet: Packet
-    address: str
-
     def is_valid(self) -> bool:
-        return self.packet.type and self.packet.type != PacketType.INVALID
-
+        return self.type and self.type != PacketType.INVALID
+    
     def get_reason(self) -> str:
-        return self.packet.data.get("reason", "server possibly disconnected")
+        return self.data.get("reason", "server possibly disconnected")
 
     def get_session_token(self) -> str | None:
-        return self.packet.data.get("session_token")
+        return self.data.get("session_token")

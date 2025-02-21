@@ -1,5 +1,5 @@
 
-from mineme_core.network.packet import *
+from mineme_core.network.packet import Packet, PacketType
 from mineme_core.localization import _tr
 
 from context import ClientContext
@@ -9,6 +9,10 @@ def cmd_register(context: ClientContext):
     args = context.console.arguments
     client_socket = context.client_socket
 
+    if not client_socket.connected:
+        client_socket.connect()
+        return print("Attempting to reconnect to server. Please try again.")
+
     if len(args) < 2:
         return print("Usage: register <username> <password>")
 
@@ -17,7 +21,10 @@ def cmd_register(context: ClientContext):
 
     # username:
     data = {"username": username, "password": password}
-    client_socket.send(Packet(PacketType.REGISTER_USER, data=data))
+
+    if not client_socket.send(Packet(PacketType.REGISTER_USER, data)):
+        return print('Connection timed out. Please try again later')
+    
     packet_result = client_socket.receive()
 
     if not packet_result.is_valid():

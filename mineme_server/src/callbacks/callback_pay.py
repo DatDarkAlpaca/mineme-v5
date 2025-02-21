@@ -1,5 +1,6 @@
 from mineme_core.constants import CURRENCY_SYMBOL
-from mineme_core.network.packet import Packet, RecvPacket, PacketType
+from mineme_core.network.mine_socket import MineSocket
+from mineme_core.network.packet import Packet, PacketType
 
 from context import ServerContext
 from utils.packet_utils import (
@@ -9,29 +10,26 @@ from utils.packet_utils import (
 )
 
 
-def pay_callback(context: ServerContext, packet_result: RecvPacket):
-    server_socket = context.server_socket
+def pay_callback(context: ServerContext, client_socket: MineSocket, packet_result: Packet):
     user_table = context.database_data.user_table
     player_table = context.database_data.player_table
 
-    address = packet_result.address
-
     session_token = packet_result.get_session_token()
-    session = context.session_data.get(session_token)
+    session = context.session_handler.get(session_token)
 
     if not session:
-        return send_invalid_session_packet(server_socket, address)
+        return send_invalid_session_packet(client_socket)
 
-    if not is_user_authenticated(context.session_data, packet_result):
-        return send_unauthenticated_packet(server_socket, address)
+    if not is_user_authenticated(context.session_handler, packet_result):
+        return send_unauthenticated_packet(client_socket)
 
     def send_invalid_args():
         data = {"reason": f"invalid arguments: username={username} | amount={amount}"}
-        return server_socket.send(Packet(PacketType.INVALID, data), address)
+        return client_socket.send(Packet(PacketType.INVALID, data))
 
     try:
-        username = packet_result.packet.data.get("username")
-        amount = float(packet_result.packet.data.get("amount"))
+        username = packet_result.data.get("username")
+        amount = float(packet_result.data.get("amount"))
     except Exception:
         return send_invalid_args()
 
@@ -49,7 +47,7 @@ def pay_callback(context: ServerContext, packet_result: RecvPacket):
         data = {
             "reason": f"you do not have the required funds to pay {username}. Your current balance is: {CURRENCY_SYMBOL}{balance}"
         }
-        return server_socket.send(Packet(PacketType.INVALID, data), address)
+        return client_socket.send(Packet(PacketType.INVALID, data))
 
     # update sender's balance:
     player_table.update_player_balance(uid, balance - amount)
@@ -59,8 +57,8 @@ def pay_callback(context: ServerContext, packet_result: RecvPacket):
     player_table.update_player_balance(receiver_uid, receiver_balance + amount)
 
     # send a notification to the receiver:
-    for _, receiver_session in context.session_data.items():
+    for _, receiver_session in context.session_handler.items():
         if receiver_session.user.username == username:
             receiver_session.notification_queue.append(f"{session.user.display_name} sent you {CURRENCY_SYMBOL}{amount:.2f}")
 
-    server_socket.send(Packet(PacketType.PAY, {}), address)
+    client_socket.send(Packet(PacketType.PAY, {}))

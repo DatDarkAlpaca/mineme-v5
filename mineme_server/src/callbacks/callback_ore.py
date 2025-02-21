@@ -1,18 +1,16 @@
-from mineme_core.network.packet import Packet, PacketType, RecvPacket
+from mineme_core.network.mine_socket import MineSocket
+from mineme_core.network.packet import Packet, PacketType
 from context import ServerContext
 
 
-def ore_callback(context: ServerContext, packet_result: RecvPacket):
-    server_socket = context.server_socket
+def ore_callback(context: ServerContext, client_socket: MineSocket, packet_result: Packet):
     ores = context.database_data.ores
     categories = context.database_data.ore_categories
 
-    address = packet_result.address
-
-    ore_name = packet_result.packet.data.get("ore_name")
+    ore_name = packet_result.data.get("ore_name")
     if not ore_name:
         data = {"reason": "invalid ore name"}
-        return server_socket.send(Packet(PacketType.INVALID, data), address)
+        return client_socket.send(Packet(PacketType.INVALID, data))
 
     try:
         for ore_data in ores:
@@ -25,7 +23,7 @@ def ore_callback(context: ServerContext, packet_result: RecvPacket):
 
     except Exception:
         data = {"reason": "invalid ore name"}
-        return server_socket.send(Packet(PacketType.INVALID, data), address)
+        return client_socket.send(Packet(PacketType.INVALID, data))
 
     data = {
         "ore_name": ore.name,
@@ -35,4 +33,4 @@ def ore_callback(context: ServerContext, packet_result: RecvPacket):
         "max_weight": ore.max_weight,
     }
 
-    return server_socket.send(Packet(PacketType.ORE, data), address)
+    return client_socket.send(Packet(PacketType.ORE, data))

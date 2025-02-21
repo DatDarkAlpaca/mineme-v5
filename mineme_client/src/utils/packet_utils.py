@@ -1,5 +1,5 @@
 from context import ClientContext
-from mineme_core.network.packet import *
+from mineme_core.network.packet import Packet, PacketType
 
 
 def send_leave_packet(context: ClientContext):

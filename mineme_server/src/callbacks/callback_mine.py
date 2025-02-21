@@ -1,5 +1,6 @@
 from mineme_core.game.mine import mine
-from mineme_core.network.packet import Packet, RecvPacket, PacketType
+from mineme_core.network.mine_socket import MineSocket
+from mineme_core.network.packet import Packet, PacketType
 
 from context import ServerContext
 from utils.packet_utils import (
@@ -9,21 +10,18 @@ from utils.packet_utils import (
 )
 
 
-def mine_callback(context: ServerContext, packet_result: RecvPacket):
-    server_socket = context.server_socket
+def mine_callback(context: ServerContext, client_socket: MineSocket, packet_result: Packet):
     player_table = context.database_data.player_table
     ores = context.database_data.ores
 
-    address = packet_result.address
-
     session_token = packet_result.get_session_token()
-    session = context.session_data.get(session_token)
+    session = context.session_handler.get(session_token)
 
     if not session:
-        return send_invalid_session_packet(server_socket, address)
+        return send_invalid_session_packet(client_socket)
 
-    if not is_user_authenticated(context.session_data, packet_result):
-        return send_unauthenticated_packet(server_socket, address)
+    if not is_user_authenticated(context.session_handler, packet_result):
+        return send_unauthenticated_packet(client_socket)
 
 
     uid = session.user.uid
@@ -31,7 +29,7 @@ def mine_callback(context: ServerContext, packet_result: RecvPacket):
 
     if not player:
         data = {"reason": f"player {uid} not found"}
-        return server_socket.send(Packet(PacketType.INVALID, data), address)
+        return client_socket.send(Packet(PacketType.INVALID, data))
 
     ore_data = mine(ores)
     ore_price = ore_data.ore.price * ore_data.weight
@@ -47,4 +45,4 @@ def mine_callback(context: ServerContext, packet_result: RecvPacket):
     balance = player.balance
     player_table.update_player_balance(uid, balance + ore_price)
 
-    return server_socket.send(Packet(PacketType.MINE, data), address)
+    return client_socket.send(Packet(PacketType.MINE, data))

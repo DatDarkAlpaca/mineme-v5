@@ -8,6 +8,10 @@ def cmd_join(context: ClientContext):
     client_socket = context.client_socket
     view_handler = context.view_handler
 
+    if not client_socket.connected:
+        client_socket.connect()
+        return print("Attempting to reconnect to server. Please try again.")
+
     if len(args) < 2:
         return print("Usage: join <username> <password>")
 
@@ -17,16 +21,17 @@ def cmd_join(context: ClientContext):
     # username:
     data = {"username": username, "password": password}
 
-    client_socket.send(Packet(PacketType.JOIN_USER, data))
+    if not client_socket.send(Packet(PacketType.JOIN_USER, data)):
+        return print('A connection error has occurred. Please try again later')
+    
     packet_result = client_socket.receive()
-
     if not packet_result.is_valid():
         return print(
             f"Usage: join <username> <password> | {packet_result.get_reason()}"
         )
 
-    username = packet_result.packet.data["username"]
-    display_name = packet_result.packet.data["display_name"]
+    username = packet_result.data["username"]
+    display_name = packet_result.data["display_name"]
     session_token = packet_result.get_session_token()
 
     view_handler.get_view("game").set_user(username, display_name, session_token)

@@ -1,9 +1,9 @@
-import os
-import time
-from threading import Thread, Lock
+from threading import Thread
 from datetime import timedelta, datetime
 
-from mineme_core.network.packet import PacketType, RecvPacket
+from mineme_core.network.mine_socket import MineSocket
+from mineme_core.network.packet import Packet, PacketType
+
 from context import ServerContext
 
 from callbacks import (
@@ -26,25 +26,16 @@ from utils.packet_utils import (
 class ServerApp:
     def __init__(self):
         self.context = ServerContext()
-
-        self.server_lock = Lock()
-
-        self.__initialize_server_data()
-
-    def initialize(self):
-        thread = Thread(target=lambda: self.__execute_server(), daemon=True)
-        thread.start()
-
-        thread = Thread(target=lambda: self.__cleanup_timeout_sessions(), daemon=True)
-        thread.start()
-
-    def run(self):
         self.initialize()
 
-        host = os.environ.get("SERVER_ADDRESS")
-        port = int(os.environ.get("SERVER_PORT"))
+    def initialize(self):
+        self.initialize_packet_handler()
 
-        print(f"Initialized server at {host}:{port}.")
+        thread = Thread(target=lambda: self.context.server_socket.execute(), daemon=True)
+        thread.start()
+    
+    def run(self):
+        print(f"Initialized server at {self.context.server_socket.host}:{self.context.server_socket.port}.")
         while True:
             command = input("> ").lower()
 
@@ -54,22 +45,22 @@ class ServerApp:
             if command.startswith('kick'):
                 session_token = command.split(' ')[1]
 
-                session = self.context.session_data.get(session_token)
+                session = self.context.session_handler.get(session_token)
                 if not session:
                     continue
                 
-                self.context.session_data.pop(session_token)                
+                self.context.session_handler.remove(session_token)
 
             elif command.startswith('notify'):
                 session_token = command.split(' ')[1]
                 message = ''.join(command.split(' ')[2:])
             
                 if session_token == '*':
-                    for _, session in self.context.session_data.items():
+                    for _, session in self.context.session_handler.items():
                         session.notification_queue.append(message)
                     continue
 
-                session = self.context.session_data.get(session_token)
+                session = self.context.session_handler.get(session_token)
                 if not session:
                     continue
                 
@@ -77,89 +68,59 @@ class ServerApp:
             
             elif command.startswith("list"):
                 print("Session list:")
-                for session_token, session_data in self.context.session_data.items():
-                    uid = session_data.user.uid
-                    address = session_data.address
-                    username = session_data.user.username
-                    display = session_data.user.display_name
+                for session_token, session in self.context.session_handler.items():
+                    uid = session.user.uid
+                    username = session.user.username
+                    display = session.user.display_name
 
-                    print(f"* [{address}][{session_token}]: {username} ({display}) [{uid}]")
+                    print(f"* [[{session_token}]: {username} ({display}) [{uid}]")
 
-    def __execute_server(self):
-        while True:
-            packet_result = self.context.server_socket.receive()
-            with self.server_lock:
-                self.context.packet_handler.execute_packet(packet_result)
-
-    def __cleanup_timeout_sessions(self):
-        while True:
-            now = datetime.now()
-
-            with self.server_lock:
-                expired_tokens = []
-                for session_token, session_data in self.context.session_data.items():
-                    last_active = session_data.last_activity
-                    idle_duration = now - last_active
-
-                    timed_out = idle_duration > timedelta(
-                        minutes=float(os.environ.get("SESSION_TIMEOUT"))
-                    )
-                    if not timed_out:
-                        continue
-
-                    expired_tokens.append(session_token)
-
-                for session_token in expired_tokens:
-                    del self.context.session_data[session_token]
-
-            time.sleep(1.0)
-
-    def __initialize_server_data(self):
+    def initialize_packet_handler(self):
         packet_handler = self.context.packet_handler
         
         packet_handler.register(
             PacketType.POLL_NOTIFICATION,
-            lambda packet_result: notifications_callback(self.context, packet_result),
+            lambda client_socket, packet_result: notifications_callback(self.context, client_socket, packet_result),
         )
         packet_handler.register_on_execute(
-            lambda packet_result: self.__handle_command_cooldown(packet_result)
+            lambda client_socket, packet_result: self.__handle_command_cooldown(client_socket, packet_result)
         )
 
         # Authentication:
         packet_handler.register(
             PacketType.REGISTER_USER,
-            lambda packet_result: register_callback(self.context, packet_result),
+            lambda client_socket, packet_result: register_callback(self.context, client_socket, packet_result),
         )
         packet_handler.register(
             PacketType.JOIN_USER,
-            lambda packet_result: join_callback(self.context, packet_result),
+            lambda client_socket, packet_result: join_callback(self.context, client_socket, packet_result),
         )
         packet_handler.register(
             PacketType.LEAVE_USER,
-            lambda packet_result: leave_callback(self.context, packet_result),
+            lambda client_socket, packet_result: leave_callback(self.context, client_socket, packet_result),
         )
 
         # Game:
         packet_handler.register(
             PacketType.CHECK_BALANCE,
-            lambda packet_result: balance_callback(self.context, packet_result),
+            lambda client_socket, packet_result: balance_callback(self.context, client_socket, packet_result),
         )
         packet_handler.register(
-            PacketType.MINE, lambda packet_result: mine_callback(self.context, packet_result)
+            PacketType.MINE, lambda client_socket, packet_result: mine_callback(self.context, client_socket, packet_result)
         )
         packet_handler.register(
-            PacketType.GAMBLE, lambda packet_result: gamble_callback(self.context, packet_result)
+            PacketType.GAMBLE, lambda client_socket, packet_result: gamble_callback(self.context, client_socket, packet_result)
         )
         packet_handler.register(
             PacketType.ORE,
-            lambda packet_result: ore_callback(self.context, packet_result),
+            lambda client_socket, packet_result: ore_callback(self.context, client_socket, packet_result),
         )
         packet_handler.register(
-            PacketType.PAY, lambda packet_result: pay_callback(self.context, packet_result)
+            PacketType.PAY, lambda client_socket, packet_result: pay_callback(self.context, client_socket, packet_result)
         )
 
-    def __handle_command_cooldown(self, packet_result: RecvPacket) -> bool:
-        type = packet_result.packet.type
+    def __handle_command_cooldown(self, client_socket: MineSocket, packet_result: Packet) -> bool:
+        type = packet_result.type
 
         if type in [
             PacketType.REGISTER_USER,
@@ -170,11 +131,9 @@ class ServerApp:
             return True
 
         session_token = packet_result.get_session_token()
-        session = self.context.session_data.get(session_token)
+        session = self.context.session_handler.get(session_token)
         if not session_token or not session:
-            send_invalid_session_packet(
-                self.context.server_socket, packet_result.address
-            )
+            send_invalid_session_packet(client_socket)
             return False
 
         last_executed = session.command_cooldowns.get_cooldown(type)
@@ -185,12 +144,8 @@ class ServerApp:
 
         if time_passed < cooldown_time:
             remaining = cooldown_time.total_seconds() - time_passed.total_seconds()
-            send_delayed_command_packet(
-                self.context.server_socket, remaining, packet_result.address
-            )
+            send_delayed_command_packet(client_socket, remaining)
             return False
 
         session.command_cooldowns.use_command(type)
-        session.last_activity = now
         return True
-
