@@ -1,7 +1,11 @@
-from context import ServerContext
-from utils.packet_utils import send_invalid_session_packet
 from mineme_core.network.packet import Packet, PacketType, RecvPacket
 
+from context import ServerContext
+from utils.packet_utils import (
+    send_invalid_session_packet, 
+    send_unauthenticated_packet,
+    is_user_authenticated
+)
 
 def balance_callback(context: ServerContext, packet_result: RecvPacket):
     server_socket = context.server_socket
@@ -14,6 +18,10 @@ def balance_callback(context: ServerContext, packet_result: RecvPacket):
 
     if not session:
         return send_invalid_session_packet(server_socket, address)
+
+    if not is_user_authenticated(context.session_data, packet_result):
+        return send_unauthenticated_packet(server_socket, address)
+
 
     uid = session.user.uid
     player = player_table.fetch_player(uid)

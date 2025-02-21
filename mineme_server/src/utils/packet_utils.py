@@ -1,6 +1,12 @@
+from session_data import SessionData, session_token
 from server_socket import ServerSocket
-from mineme_core.network.packet import Packet, PacketType
+from mineme_core.network.packet import Packet, PacketType, RecvPacket
 
+
+def is_user_authenticated(session_data: dict[session_token, SessionData], packet_result: RecvPacket) -> bool:
+    session_token = packet_result.get_session_token()
+    return session_data.get(session_token) and session_data[session_token].authenticated
+    
 
 def send_invalid_session_packet(server_socket: ServerSocket, address):
     data = {"reason": "invalid session | you were timed out | please log in again"}

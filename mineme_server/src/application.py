@@ -4,7 +4,6 @@ from threading import Thread, Lock
 from datetime import timedelta, datetime
 
 from mineme_core.network.packet import PacketType, RecvPacket
-from mineme_core.constants import *
 from context import ServerContext
 
 from callbacks import (
@@ -18,7 +17,10 @@ from callbacks import (
     pay_callback,
     notifications_callback
 )
-from utils.packet_utils import *
+from utils.packet_utils import (
+    send_invalid_session_packet,
+    send_delayed_command_packet
+)
 
 
 class ServerApp:
@@ -29,12 +31,15 @@ class ServerApp:
 
         self.__initialize_server_data()
 
-    def run(self):
+    def initialize(self):
         thread = Thread(target=lambda: self.__execute_server(), daemon=True)
         thread.start()
 
         thread = Thread(target=lambda: self.__cleanup_timeout_sessions(), daemon=True)
         thread.start()
+
+    def run(self):
+        self.initialize()
 
         host = os.environ.get("SERVER_ADDRESS")
         port = int(os.environ.get("SERVER_PORT"))
@@ -55,7 +60,7 @@ class ServerApp:
                 
                 self.context.session_data.pop(session_token)                
 
-            if command.startswith('notify'):
+            elif command.startswith('notify'):
                 session_token = command.split(' ')[1]
                 message = ''.join(command.split(' ')[2:])
             
@@ -70,7 +75,7 @@ class ServerApp:
                 
                 session.notification_queue.append(message)
             
-            elif command == "list":
+            elif command.startswith("list"):
                 print("Session list:")
                 for session_token, session_data in self.context.session_data.items():
                     uid = session_data.user.uid
@@ -79,13 +84,6 @@ class ServerApp:
                     display = session_data.user.display_name
 
                     print(f"* [{address}][{session_token}]: {username} ({display}) [{uid}]")
-
-    def _user_authenticated(self, packet_result: RecvPacket) -> bool:
-        session_token = packet_result.get_session_token()
-        return (
-            self.context.session_data.get(session_token)
-            and self.context.session_data[session_token].authenticated
-        )
 
     def __execute_server(self):
         while True:
@@ -123,7 +121,6 @@ class ServerApp:
             PacketType.POLL_NOTIFICATION,
             lambda packet_result: notifications_callback(self.context, packet_result),
         )
-
         packet_handler.register_on_execute(
             lambda packet_result: self.__handle_command_cooldown(packet_result)
         )
@@ -133,12 +130,10 @@ class ServerApp:
             PacketType.REGISTER_USER,
             lambda packet_result: register_callback(self.context, packet_result),
         )
-
         packet_handler.register(
             PacketType.JOIN_USER,
             lambda packet_result: join_callback(self.context, packet_result),
         )
-
         packet_handler.register(
             PacketType.LEAVE_USER,
             lambda packet_result: leave_callback(self.context, packet_result),
@@ -147,20 +142,20 @@ class ServerApp:
         # Game:
         packet_handler.register(
             PacketType.CHECK_BALANCE,
-            lambda packet_result: self.__check_balance(packet_result),
+            lambda packet_result: balance_callback(self.context, packet_result),
         )
         packet_handler.register(
-            PacketType.MINE, lambda packet_result: self.__mine(packet_result)
+            PacketType.MINE, lambda packet_result: mine_callback(self.context, packet_result)
         )
         packet_handler.register(
-            PacketType.GAMBLE, lambda packet_result: self.__gamble(packet_result)
+            PacketType.GAMBLE, lambda packet_result: gamble_callback(self.context, packet_result)
         )
         packet_handler.register(
             PacketType.ORE,
             lambda packet_result: ore_callback(self.context, packet_result),
         )
         packet_handler.register(
-            PacketType.PAY, lambda packet_result: self.__pay(packet_result)
+            PacketType.PAY, lambda packet_result: pay_callback(self.context, packet_result)
         )
 
     def __handle_command_cooldown(self, packet_result: RecvPacket) -> bool:
@@ -199,26 +194,3 @@ class ServerApp:
         session.last_activity = now
         return True
 
-    def __check_balance(self, packet_result: RecvPacket):
-        if not self._user_authenticated(packet_result):
-            return send_unauthenticated_packet(self.context, packet_result)
-
-        balance_callback(self.context, packet_result)
-
-    def __mine(self, packet_result: RecvPacket):
-        if not self._user_authenticated(packet_result):
-            return send_unauthenticated_packet(self.context, packet_result)
-
-        mine_callback(self.context, packet_result)
-
-    def __gamble(self, packet_result: RecvPacket):
-        if not self._user_authenticated(packet_result):
-            return send_unauthenticated_packet(self.context, packet_result)
-
-        gamble_callback(self.context, packet_result)
-
-    def __pay(self, packet_result: RecvPacket):
-        if not self._user_authenticated(packet_result):
-            return send_unauthenticated_packet(self.context, packet_result)
-
-        pay_callback(self.context, packet_result)

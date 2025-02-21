@@ -21,7 +21,7 @@ class ClientContext:
     def __post_init__(self):
         ssp_protocol = SSP_Protocol()
         self.client_socket = ClientSocket(
-            int(os.environ.get("SERVER_PORT")),
             os.environ.get("SERVER_ADDRESS"),
+            int(os.environ.get("SERVER_PORT")),
             ssp_protocol,
         )

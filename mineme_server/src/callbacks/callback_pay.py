@@ -2,7 +2,11 @@ from mineme_core.constants import CURRENCY_SYMBOL
 from mineme_core.network.packet import Packet, RecvPacket, PacketType
 
 from context import ServerContext
-from utils.packet_utils import send_invalid_session_packet
+from utils.packet_utils import (
+    send_invalid_session_packet, 
+    send_unauthenticated_packet,
+    is_user_authenticated
+)
 
 
 def pay_callback(context: ServerContext, packet_result: RecvPacket):
@@ -17,6 +21,9 @@ def pay_callback(context: ServerContext, packet_result: RecvPacket):
 
     if not session:
         return send_invalid_session_packet(server_socket, address)
+
+    if not is_user_authenticated(context.session_data, packet_result):
+        return send_unauthenticated_packet(server_socket, address)
 
     def send_invalid_args():
         data = {"reason": f"invalid arguments: username={username} | amount={amount}"}
