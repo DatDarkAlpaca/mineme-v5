@@ -6,6 +6,7 @@ from callbacks.callback_mine import mine_callback
 from callbacks.callback_notifications import notifications_callback
 from callbacks.callback_ore import ore_callback
 from callbacks.callback_pay import pay_callback
+from callbacks.callback_profile import profile_callback
 from callbacks.callback_register import register_callback
 from callbacks.callback_users import users_callback
 
@@ -19,6 +20,7 @@ __all__ = [
     mine_callback,
     ore_callback,
     pay_callback,
+    profile_callback,
     notifications_callback,
     users_callback
 ]

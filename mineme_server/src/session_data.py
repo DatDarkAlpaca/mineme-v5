@@ -27,6 +27,11 @@ class SessionHandler:
     def add(self, token: session_token, session: SessionData):
         self.sessions[token] = session
 
+    def get_from_username(self, username: str) -> SessionData:
+        for session_token, session_data in self.items():
+            if username == session_data.user.username:
+                return session_data
+
     def get(self, token: session_token):
         return self.sessions.get(token)
 

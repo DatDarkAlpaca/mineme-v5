@@ -11,7 +11,8 @@ from callbacks import (
     ore_callback,
     pay_callback,
     notifications_callback,
-    users_callback
+    users_callback,
+    profile_callback
 )
 from context import ServerContext
 from utils.cooldown import handle_command_cooldown
@@ -140,9 +141,17 @@ class ServerApp:
                 self.context, client_socket, packet_result
             ),
         )
+        
+        # Session:
         packet_handler.register(
             PacketType.USERS,
             lambda client_socket, packet_result: users_callback(
+                self.context, client_socket, packet_result
+            ),
+        )
+        packet_handler.register(
+            PacketType.PROFILE,
+            lambda client_socket, packet_result: profile_callback(
                 self.context, client_socket, packet_result
             ),
         )

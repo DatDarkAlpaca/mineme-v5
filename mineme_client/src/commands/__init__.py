@@ -8,6 +8,7 @@ from commands.cmd_leave import leave_command
 from commands.cmd_mine import mine_command
 from commands.cmd_ore import ore_command
 from commands.cmd_pay import pay_command
+from commands.cmd_profile import profile_command
 from commands.cmd_quit import quit_command
 from commands.cmd_register import register_command
 from commands.cmd_users import users_command
@@ -24,6 +25,7 @@ __all__ = [
     mine_command,
     ore_command,
     pay_command,
+    profile_command,
     quit_command,
     register_command,
     users_command

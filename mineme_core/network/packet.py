@@ -15,6 +15,7 @@ class PacketType(Enum):
     ORE = auto()
     PAY = auto()
     USERS = auto()
+    PROFILE = auto()
 
     POLL_NOTIFICATION = auto()
 

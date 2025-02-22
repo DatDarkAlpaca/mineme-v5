@@ -13,7 +13,8 @@ from commands import (
     ore_command,
     pay_command,
     help_command,
-    users_command
+    users_command,
+    profile_command
 )
 
 from tasks import handle_notifications
@@ -50,6 +51,7 @@ class GameView(View):
         self.command_handler.register_command("pay", pay_command)
 
         self.command_handler.register_command("users", users_command)
+        self.command_handler.register_command("profile", profile_command)
 
     def on_view_startup(self):
         self.context.console.clear_terminal()
