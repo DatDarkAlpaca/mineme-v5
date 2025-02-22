@@ -22,15 +22,13 @@ class CommandCooldown:
 
 
 class CommandCooldownTable:
-    command_delays: dict[PacketType, int] = {}
+    def __init__(self):
+        self.command_delays: dict[PacketType, int] = {}
+    
+    def set_delay(self, type: PacketType, time: int):
+        self.command_delays[type] = time
 
-    @classmethod
-    def initialize(cls):
-        cls.command_delays[PacketType.MINE] = 1
-        cls.command_delays[PacketType.GAMBLE] = 1
-
-    @classmethod
-    def get_delay(cls, type: PacketType):
-        return cls.command_delays.get(
+    def get_delay(self, type: PacketType):
+        return self.command_delays.get(
             type, float(os.environ.get("DEFAULT_COMMAND_DELAY"))
         )

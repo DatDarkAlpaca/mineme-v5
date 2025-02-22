@@ -25,6 +25,7 @@ class ServerApp:
 
     def initialize(self):
         self.initialize_packet_handler()
+        self.initialize_cooldown_table()
 
         thread = Thread(
             target=lambda: self.context.server_socket.execute(), daemon=True
@@ -155,3 +156,7 @@ class ServerApp:
                 self.context, client_socket, packet_result
             ),
         )
+
+    def initialize_cooldown_table(self):
+        self.context.cooldown_table.set_delay(PacketType.MINE, 3)
+        self.context.cooldown_table.set_delay(PacketType.GAMBLE, 10)
