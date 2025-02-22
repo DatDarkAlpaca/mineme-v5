@@ -41,6 +41,10 @@ def pay_callback(
     # TOOD: check if username exists:
     receiver_user = user_table.fetch_user(username)
     receiver_uid = receiver_user.uid
+    
+    if receiver_uid == session.user.uid:
+        data = {"reason": "you can't send money to yourself"}
+        return client_socket.send(Packet(PacketType.INVALID, data))
 
     uid = session.user.uid
     balance = player_table.fetch_player(uid).balance
