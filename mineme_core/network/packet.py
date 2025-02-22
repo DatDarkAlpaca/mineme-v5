@@ -14,6 +14,7 @@ class PacketType(Enum):
     GAMBLE = auto()
     ORE = auto()
     PAY = auto()
+    USERS = auto()
 
     POLL_NOTIFICATION = auto()
 

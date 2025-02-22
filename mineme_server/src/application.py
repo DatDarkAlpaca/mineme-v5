@@ -1,10 +1,5 @@
 from threading import Thread
-from datetime import timedelta, datetime
-
-from mineme_core.network.mine_socket import MineSocket
-from mineme_core.network.packet import Packet, PacketType
-
-from context import ServerContext
+from mineme_core.network.packet import PacketType
 
 from callbacks import (
     register_callback,
@@ -16,8 +11,10 @@ from callbacks import (
     ore_callback,
     pay_callback,
     notifications_callback,
+    users_callback
 )
-from utils.packet_utils import send_invalid_session_packet, send_delayed_command_packet
+from context import ServerContext
+from utils.cooldown import handle_command_cooldown
 
 
 class ServerApp:
@@ -50,6 +47,7 @@ class ServerApp:
                 if not session:
                     continue
 
+                session.notification_queue.append("You have been kicked out. Please join in again")
                 self.context.session_handler.remove(session_token)
 
             elif command.startswith("notify"):
@@ -86,8 +84,8 @@ class ServerApp:
             ),
         )
         packet_handler.register_on_execute(
-            lambda client_socket, packet_result: self.__handle_command_cooldown(
-                client_socket, packet_result
+            lambda client_socket, packet_result: handle_command_cooldown(
+                self.context, client_socket, packet_result
             )
         )
 
@@ -142,36 +140,9 @@ class ServerApp:
                 self.context, client_socket, packet_result
             ),
         )
-
-    def __handle_command_cooldown(
-        self, client_socket: MineSocket, packet_result: Packet
-    ) -> bool:
-        type = packet_result.type
-
-        if type in [
-            PacketType.REGISTER_USER,
-            PacketType.JOIN_USER,
-            PacketType.LEAVE_USER,
-            PacketType.POLL_NOTIFICATION,
-        ]:
-            return True
-
-        session_token = packet_result.get_session_token()
-        session = self.context.session_handler.get(session_token)
-        if not session_token or not session:
-            send_invalid_session_packet(client_socket)
-            return False
-
-        last_executed = session.command_cooldowns.get_cooldown(type)
-
-        now = datetime.now()
-        time_passed = now - last_executed
-        cooldown_time = timedelta(seconds=self.context.cooldown_table.get_delay(type))
-
-        if time_passed < cooldown_time:
-            remaining = cooldown_time.total_seconds() - time_passed.total_seconds()
-            send_delayed_command_packet(client_socket, remaining)
-            return False
-
-        session.command_cooldowns.use_command(type)
-        return True
+        packet_handler.register(
+            PacketType.USERS,
+            lambda client_socket, packet_result: users_callback(
+                self.context, client_socket, packet_result
+            ),
+        )

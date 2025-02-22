@@ -31,11 +31,10 @@ def cmd_join(context: ClientContext):
             f"Usage: join <username> <password> | {packet_result.get_reason()}"
         )
 
-    username = packet_result.data["username"]
-    display_name = packet_result.data["display_name"]
-    session_token = packet_result.get_session_token()
+    context.username = packet_result.data["username"]
+    context.display_name = packet_result.data["display_name"]
+    context.session_token = packet_result.get_session_token()
 
-    view_handler.get_view("game").set_user(username, display_name, session_token)
     view_handler.set_view("game")
 
 

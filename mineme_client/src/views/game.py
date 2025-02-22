@@ -12,6 +12,8 @@ from commands import (
     history_command,
     ore_command,
     pay_command,
+    help_command,
+    users_command
 )
 
 from tasks import handle_notifications
@@ -23,9 +25,6 @@ class GameView(View):
         super().__init__()
 
         self.context = context
-
-        self.display_name = ""
-        self.username = ""
         self.logo = ""
 
     def on_startup(self):
@@ -40,6 +39,7 @@ class GameView(View):
         self.command_handler.register_command("quit", quit_command)
         self.command_handler.register_command("cls", clear_command)
         self.command_handler.register_command("history", history_command)
+        self.command_handler.register_command("help", help_command)
 
         self.command_handler.register_command("leave", leave_command)
 
@@ -49,6 +49,8 @@ class GameView(View):
         self.command_handler.register_command("ore", ore_command)
         self.command_handler.register_command("pay", pay_command)
 
+        self.command_handler.register_command("users", users_command)
+
     def on_view_startup(self):
         self.context.console.clear_terminal()
         self.display_header()
@@ -56,8 +58,8 @@ class GameView(View):
         self.register_task(lambda: handle_notifications(self.context), 1)
 
     def on_view_shutdown(self):
-        self.username = ""
-        self.display_name = ""
+        self.context.username = ""
+        self.context.display_name = ""
         self.context.session_token = ""
 
         self.clear_tasks()
@@ -77,14 +79,9 @@ class GameView(View):
         else:
             print("Invalid command. Please try again.")
 
-    def set_user(self, username: str, display_name: str, session_token: str):
-        self.username = username
-        self.display_name = display_name
-        self.context.session_token = session_token
-
     def display_header(self):
         print(f"{self.logo}\n")
-        print(f"* Logged in: {self.display_name}")
+        print(f"* Logged in: {self.context.display_name}")
 
         lines_used = self.logo.count("\n") + 2
         self.context.console.set_last_line(lines_used)

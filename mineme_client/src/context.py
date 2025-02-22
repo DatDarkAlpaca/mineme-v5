@@ -15,8 +15,11 @@ class ClientContext:
     view_handler: ViewHandler = field(default_factory=ViewHandler)
     console: Console = field(default_factory=Console)
     client_socket: None | ClientSocket = None
-    session_token: str = ""
     running: bool = True
+
+    session_token: str = ""
+    username: str = ""
+    display_name: str = ""
 
     def __post_init__(self):
         ssp_protocol = SSP_Protocol()

@@ -8,7 +8,8 @@ from commands import (
     quit_command, 
     clear_command,
     register_command,
-    join_command
+    join_command,
+    help_command
 )
 
 
@@ -24,6 +25,7 @@ class WelcomeView(View):
 
         self.command_handler.register_command("quit", quit_command)
         self.command_handler.register_command("clear", clear_command)
+        self.command_handler.register_command("help", help_command)
 
         self.command_handler.register_command("register", register_command)
         self.command_handler.register_command("join", join_command)

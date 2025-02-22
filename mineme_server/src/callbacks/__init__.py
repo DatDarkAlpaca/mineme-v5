@@ -1,14 +1,13 @@
-from callbacks.callback_register import register_callback
-from callbacks.callback_join import join_callback
-from callbacks.callback_leave import leave_callback
-
 from callbacks.callback_balance import balance_callback
 from callbacks.callback_gamble import gamble_callback
+from callbacks.callback_join import join_callback
+from callbacks.callback_leave import leave_callback
 from callbacks.callback_mine import mine_callback
+from callbacks.callback_notifications import notifications_callback
 from callbacks.callback_ore import ore_callback
 from callbacks.callback_pay import pay_callback
-
-from callbacks.callback_notifications import notifications_callback
+from callbacks.callback_register import register_callback
+from callbacks.callback_users import users_callback
 
 
 __all__ = [
@@ -21,4 +20,5 @@ __all__ = [
     ore_callback,
     pay_callback,
     notifications_callback,
+    users_callback
 ]
