@@ -1,25 +1,26 @@
-from commands.cmd_balance import cmd_balance
-from commands.cmd_clear import cmd_clear
-from commands.cmd_gamble import cmd_gamble
-from commands.cmd_history import cmd_history
-from commands.cmd_join import cmd_join, cmd_leave
-from commands.cmd_mine import cmd_mine
-from commands.cmd_ore import cmd_ore
-from commands.cmd_pay import cmd_pay
-from commands.cmd_quit import cmd_quit
-from commands.cmd_register import cmd_register
+from commands.cmd_balance import balance_command
+from commands.cmd_clear import clear_command
+from commands.cmd_gamble import gamble_command
+from commands.cmd_history import history_command
+from commands.cmd_join import join_command
+from commands.cmd_leave import leave_command
+from commands.cmd_mine import mine_command
+from commands.cmd_ore import ore_command
+from commands.cmd_pay import pay_command
+from commands.cmd_quit import quit_command
+from commands.cmd_register import register_command
 
 
 __all__ = [
-    cmd_balance,
-    cmd_clear,
-    cmd_gamble,
-    cmd_history,
-    cmd_join,
-    cmd_leave,
-    cmd_mine,
-    cmd_ore,
-    cmd_pay,
-    cmd_quit,
-    cmd_register,
+    balance_command,
+    clear_command,
+    gamble_command,
+    history_command,
+    join_command,
+    leave_command,
+    mine_command,
+    ore_command,
+    pay_command,
+    quit_command,
+    register_command,
 ]

@@ -1,5 +1,6 @@
 from termcolor import colored
 from context import ClientContext
+from mineme_core.commands import Command
 from mineme_core.constants import CURRENCY_SYMBOL
 from mineme_core.network.packet import Packet, PacketType
 
@@ -50,3 +51,11 @@ def cmd_gamble(context: ClientContext):
             colored("Oh no!", "red")
             + f" You lost... You have lost {CURRENCY_SYMBOL}{float(amount)}"
         )
+
+gamble_command = Command(
+    "gamble",
+    "gambles a portion of your money",
+    "gamble <amount> <multiplier: 1.5>",
+    [],
+    cmd_gamble
+)

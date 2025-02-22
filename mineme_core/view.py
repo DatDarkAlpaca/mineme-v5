@@ -3,11 +3,12 @@ from queue import Queue
 from threading import Thread
 from typing import Callable, Protocol
 
+from mineme_core.commands import CommandHandler
+
 
 class View(Protocol):
     def __init__(self):
-        self.on_execute_function_list: list = []
-        self.command_list: dict = {}
+        self.command_handler = CommandHandler()
         self.tasks = Queue()
 
         self.event_thread = Thread(target=lambda: self.__execute_tasks(), daemon=True)
@@ -23,28 +24,11 @@ class View(Protocol):
 
     def on_view_shutdown(self): ...
 
-    def register_on_execute(self, function: Callable):
-        self.on_execute_function_list.append(function)
-
-    def register_command(self, command_name: str, function: Callable):
-        self.command_list[command_name] = function
-
     def register_task(self, function: Callable, cooldown: int):
         self.tasks.put((function, cooldown))
 
     def clear_tasks(self):
         self.tasks = Queue()
-
-    def handle_command(self, command: str, args: list) -> bool:
-        command_function = self.command_list.get(command)
-        if not command_function:
-            return False
-
-        for function in self.on_execute_function_list:
-            function(command, args)
-
-        command_function(args)
-        return True
 
     def _set_handler(self, handler):
         self.handler = handler

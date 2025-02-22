@@ -1,4 +1,5 @@
 from context import ClientContext
+from mineme_core.commands import Command
 from mineme_core.localization import _tr
 from mineme_core.network.packet import Packet, PacketType
 from mineme_core.constants import CURRENCY_SYMBOL, SIZE_MODIFIERS
@@ -55,3 +56,12 @@ def cmd_mine(context: ClientContext):
             price,
         )
     )
+
+
+mine_command = Command(
+    "mine",
+    "mines a patch of land for money",
+    "mine",
+    [],
+    cmd_mine
+)

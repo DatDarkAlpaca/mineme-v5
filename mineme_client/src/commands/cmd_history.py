@@ -1,4 +1,5 @@
 from context import ClientContext
+from mineme_core.commands import Command
 
 
 def cmd_history(context: ClientContext):
@@ -15,3 +16,12 @@ def cmd_history(context: ClientContext):
     for command, time in context.command_history.history:
         formatted_time = time.strftime("%H:%M:%S")
         print(f"* [{formatted_time}] {command}")
+
+
+history_command = Command(
+    "history",
+    "display a commands history",
+    "history",
+    [],
+    cmd_history
+)

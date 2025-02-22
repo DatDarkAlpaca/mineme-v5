@@ -1,5 +1,6 @@
 from context import ClientContext
 
+from mineme_core.commands import Command
 from mineme_core.localization import _tr
 from mineme_core.constants import CURRENCY_SYMBOL
 from mineme_core.network.packet import Packet, PacketType
@@ -31,3 +32,12 @@ def cmd_balance(context: ClientContext):
             get_number_with_separator(float(balance)),
         )
     )
+
+
+balance_command = Command(
+    "balance", 
+    "requests the user's current balance",
+    "balance",
+    None,
+    cmd_balance
+)

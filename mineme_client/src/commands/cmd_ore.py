@@ -1,4 +1,6 @@
 from context import ClientContext
+
+from mineme_core.commands import Command
 from mineme_core.network.packet import Packet, PacketType
 
 
@@ -33,3 +35,12 @@ def cmd_ore(context: ClientContext):
 
     information = f"{ore_name} information:\n * category: {category}\n * price: W${price}\n * minimum weight: {min_weight}kg\n * maximum weight: {max_weight}kg"
     print(information)
+
+
+ore_command = Command(
+    "ore_info",
+    "displays information about a specific ore",
+    "ore_info",
+    ["ore"],
+    cmd_ore
+)

@@ -4,25 +4,29 @@ from mineme_core.constants import LOGO_FILE
 from mineme_core.utils.file import read_file
 
 from context import ClientContext
-from commands import cmd_quit, cmd_clear, cmd_register, cmd_join
+from commands import (
+    quit_command, 
+    clear_command,
+    register_command,
+    join_command
+)
 
 
 class WelcomeView(View):
     def __init__(self, context: ClientContext):
         super().__init__()
-
+        
         self.context = context
         self.logo = ""
 
     def on_startup(self):
         self.logo = read_file(LOGO_FILE)
 
-        self.register_command("quit", lambda _: cmd_quit(self.context))
-        self.register_command("cls", lambda _: cmd_clear(self.context))
-        self.register_command("clear", lambda _: cmd_clear(self.context))
+        self.command_handler.register_command("quit", quit_command)
+        self.command_handler.register_command("clear", clear_command)
 
-        self.register_command("register", lambda _: cmd_register(self.context))
-        self.register_command("join", lambda _: cmd_join(self.context))
+        self.command_handler.register_command("register", register_command)
+        self.command_handler.register_command("join", join_command)
 
     def on_view_startup(self):
         self.context.console.clear_terminal()
@@ -40,8 +44,8 @@ class WelcomeView(View):
         self.context.console.clear_terminal()
         self.display_header()
 
-        if self.handle_command(
-            self.context.console.main_command, self.context.console.arguments
+        if self.command_handler.handle_command(
+            self.context.console.main_command, self.context
         ):
             return
         else:

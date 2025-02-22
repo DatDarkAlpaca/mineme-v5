@@ -1,5 +1,6 @@
-from mineme_core.network.packet import Packet, PacketType
+from mineme_core.commands import Command
 from mineme_core.localization import _tr
+from mineme_core.network.packet import Packet, PacketType
 
 from context import ClientContext
 
@@ -36,3 +37,12 @@ def cmd_register(context: ClientContext):
             "Successfully registered user: {}. Use the command 'join' to join", username
         )
     )
+
+
+register_command = Command(
+    "registers",
+    "attempts to register a new user",
+    "register <username> <password>",
+    [],
+    cmd_register
+)

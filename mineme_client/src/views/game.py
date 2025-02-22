@@ -3,15 +3,15 @@ from mineme_core.constants import LOGO_FILE
 from mineme_core.utils.file import read_file
 
 from commands import (
-    cmd_quit,
-    cmd_clear,
-    cmd_leave,
-    cmd_balance,
-    cmd_mine,
-    cmd_gamble,
-    cmd_history,
-    cmd_ore,
-    cmd_pay,
+    quit_command,
+    clear_command,
+    leave_command,
+    balance_command,
+    mine_command,
+    gamble_command,
+    history_command,
+    ore_command,
+    pay_command,
 )
 
 from tasks import handle_notifications
@@ -31,22 +31,23 @@ class GameView(View):
     def on_startup(self):
         self.logo = read_file(LOGO_FILE)
 
-        self.register_on_execute(
-            lambda command, args: self.context.command_history.append(command, args)
+        self.command_handler.register_on_command_start(
+            lambda context: self.context.command_history.append(
+                context.console.main_command, context.console.arguments
+            )
         )
 
-        self.register_command("quit", lambda _: cmd_quit(self.context))
-        self.register_command("cls", lambda _: cmd_clear(self.context))
-        self.register_command("clear", lambda _: cmd_clear(self.context))
-        self.register_command("history", lambda _: cmd_history(self.context))
+        self.command_handler.register_command("quit", quit_command)
+        self.command_handler.register_command("cls", clear_command)
+        self.command_handler.register_command("history", history_command)
 
-        self.register_command("leave", lambda _: cmd_leave(self.context))
+        self.command_handler.register_command("leave", leave_command)
 
-        self.register_command("balance", lambda _: cmd_balance(self.context))
-        self.register_command("mine", lambda _: cmd_mine(self.context))
-        self.register_command("gamble", lambda _: cmd_gamble(self.context))
-        self.register_command("ore", lambda _: cmd_ore(self.context))
-        self.register_command("pay", lambda _: cmd_pay(self.context))
+        self.command_handler.register_command("balance", balance_command)
+        self.command_handler.register_command("mine", mine_command)
+        self.command_handler.register_command("gamble", gamble_command)
+        self.command_handler.register_command("ore", ore_command)
+        self.command_handler.register_command("pay", pay_command)
 
     def on_view_startup(self):
         self.context.console.clear_terminal()
@@ -69,8 +70,8 @@ class GameView(View):
         self.context.console.clear_terminal()
         self.display_header()
 
-        if self.handle_command(
-            self.context.console.main_command, self.context.console.arguments
+        if self.command_handler.handle_command(
+            self.context.console.main_command, self.context
         ):
             return
         else:

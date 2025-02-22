@@ -1,7 +1,8 @@
 from context import ClientContext
 from mineme_core.localization import _tr
-from mineme_core.network.packet import Packet, PacketType
+from mineme_core.commands import Command
 from mineme_core.constants import CURRENCY_SYMBOL
+from mineme_core.network.packet import Packet, PacketType
 
 
 def cmd_pay(context: ClientContext):
@@ -37,3 +38,12 @@ def cmd_pay(context: ClientContext):
     print(
         _tr("You have transferred {0}{1:.2f} to {2}", CURRENCY_SYMBOL, amount, username)
     )
+
+
+pay_command = Command(
+    "pay",
+    "pays a certain amount of money to an user",
+    "pay <username> <amount>",
+    ["give"],
+    cmd_pay
+)
